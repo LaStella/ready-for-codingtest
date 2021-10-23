@@ -10,3 +10,4 @@
 - [lovel1] 없는 숫자 더하기 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%97%B0%EC%8A%B5-%EC%97%86%EB%8A%94-%EC%88%AB%EC%9E%90-%EB%8D%94%ED%95%98%EA%B8%B0)
 - [level1] 음양더하기
 - [level1] 내적
+- [level1] 소수 만들기
