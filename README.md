@@ -11,3 +11,4 @@
 - [level1] 음양더하기
 - [level1] 내적
 - [level1] 소수 만들기
+- [level1] 완주하지 못한 선수 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%97%B0%EC%8A%B5-%EC%99%84%EC%A3%BC%ED%95%98%EC%A7%80-%EB%AA%BB%ED%95%9C-%EC%84%A0%EC%88%98)
