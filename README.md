@@ -17,3 +17,5 @@
 - [level1] 체육복 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%97%B0%EC%8A%B5-%EC%B2%B4%EC%9C%A1%EB%B3%B5)
 - [level1] 실패율 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%97%B0%EC%8A%B5-%EC%8B%A4%ED%8C%A8%EC%9C%A8)
 - [level1] 폰켓몬
+- [level1] 약수의 개수와 덧셈
+- [level1] 3진법 뒤집기
