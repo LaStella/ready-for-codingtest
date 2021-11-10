@@ -28,3 +28,4 @@
 - [level1] 비밀지도
 - [level1] 가운데 글자 가져오기
 - [level1] 다트 게임 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%97%B0%EC%8A%B5-%EB%8B%A4%ED%8A%B8-%EA%B2%8C%EC%9E%84)
+- [level1] 같은 숫자는 싫어
