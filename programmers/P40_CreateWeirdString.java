@@ -1,7 +1,8 @@
 class Solution {
     public String solution(String s) {
         String answer = "";
-        String[] strArry = s.split(" ");
+        // 빈칸도 예외없이 나누기 위해 -1
+        String[] strArry = s.split(" ", -1);
 
         for(int i = 0 ; i < strArry.length ; i++) {
             String temp = "";
@@ -17,10 +18,6 @@ class Solution {
         }
         
         answer = String.join(" ", strArry);
-        
-        if(answer.length() != s.length()) {
-            answer += s.substring(answer.length());
-        }
         
         return answer;
     }
