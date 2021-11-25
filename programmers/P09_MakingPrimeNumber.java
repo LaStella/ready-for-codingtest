@@ -1,4 +1,4 @@
-public class MakingPrimeNumber {
+public class P09_MakingPrimeNumber {
     class Solution {
         public int solution(int[] nums) {
             int answer = 0;

@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Budget {
+public class P18_Budget {
     // import java.util.*;
 
     class Solution {

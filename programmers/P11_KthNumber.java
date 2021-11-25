@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class KthNumber {
+public class P11_KthNumber {
     // import java.util.Arrays;
 
     class Solution {

@@ -1,4 +1,4 @@
-public class AddNegativeAndPositive {
+public class P07_AddNegativeAndPositive {
     class Solution {
         public int solution(int[] absolutes, boolean[] signs) {
             int answer = 0;

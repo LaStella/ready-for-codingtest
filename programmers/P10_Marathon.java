@@ -2,7 +2,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Marathon {
+public class P10_Marathon {
     // import java.util.Arrays;
     // import java.util.ArrayList;
     // import java.util.Collections;
