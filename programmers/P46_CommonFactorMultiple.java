@@ -6,17 +6,20 @@ class Solution {
         List<Integer> list1 = createDivArry(n);
         List<Integer> list2 = createDivArry(m);
         
+        // 두 리스트를 비교해 공약수를 구함
         list1.retainAll(list2);
         
+        // 공약수를 내림차순으로 정렬하면 첫번째 값이 최대공약수가 된다.
         Collections.sort(list1, Collections.reverseOrder());
        
         answer = new int[2];
         answer[0] = list1.get(0);
-        answer[1] = answer[0]*n/answer[0]*m/answer[0];
+        answer[1] = n*m/answer[0];
         
         return answer;
     }
     
+    // 약수 리스트를 만드는 함수
     public List createDivArry(int n) {
         List<Integer> list = new ArrayList<>();
         for(int i = 1 ; i < Math.sqrt(n) ; i++) {
