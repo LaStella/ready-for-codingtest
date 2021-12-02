@@ -59,3 +59,4 @@
 - [level2] 오픈채팅방 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%97%B0%EC%8A%B5-%EC%98%A4%ED%94%88%EC%B1%84%ED%8C%85%EB%B0%A9)
 - [level2] 카카오프렌즈 컬러링북
 - [level2] 단체사진 찍기
+- [level2] 멀쩡한 사각형 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%97%B0%EC%8A%B5-%EB%A9%80%EC%A9%A1%ED%95%9C-%EC%82%AC%EA%B0%81%ED%98%95)
