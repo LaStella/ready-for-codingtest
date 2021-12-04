@@ -61,3 +61,4 @@
 - [level2] 단체사진 찍기
 - [level2] 멀쩡한 사각형 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%97%B0%EC%8A%B5-%EB%A9%80%EC%A9%A1%ED%95%9C-%EC%82%AC%EA%B0%81%ED%98%95)
 - [level2] 124 나라의 숫자[링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%97%B0%EC%8A%B5-124-%EB%82%98%EB%9D%BC%EC%9D%98-%EC%88%AB%EC%9E%90)
+- [level2] 기능개발
