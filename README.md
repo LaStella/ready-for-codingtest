@@ -63,3 +63,4 @@
 - [level2] 124 나라의 숫자 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%97%B0%EC%8A%B5-124-%EB%82%98%EB%9D%BC%EC%9D%98-%EC%88%AB%EC%9E%90)
 - [level2] 기능개발
 - [level2] 더 맵게 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%97%B0%EC%8A%B5-%EB%8D%94-%EB%A7%B5%EA%B2%8C)
+- [level2] 타겟 넘버
