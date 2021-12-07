@@ -64,3 +64,4 @@
 - [level2] 기능개발
 - [level2] 더 맵게 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%97%B0%EC%8A%B5-%EB%8D%94-%EB%A7%B5%EA%B2%8C)
 - [level2] 타겟 넘버
+- [level2] 짝지어 제거하기 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%97%B0%EC%8A%B5-%EC%A7%9D%EC%A7%80%EC%96%B4-%EC%A0%9C%EA%B1%B0%ED%95%98%EA%B8%B0)
