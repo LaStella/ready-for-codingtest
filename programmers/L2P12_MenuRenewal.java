@@ -1,3 +1,6 @@
+// 메뉴 리뉴얼
+// https://programmers.co.kr/learn/courses/30/lessons/72411?language=java
+
 import java.util.*;
 
 class Solution {
@@ -52,7 +55,7 @@ class Solution {
         }
         else {
             // 받은 주문의 index번째에 해당하는 메뉴를 넣고 다음 순서로 이동
-            addCombtoMap(order, result+order.charAt(index), index+1, r, map);
+            addCombtoMap(order, result+String.valueOf(order.charAt(index)), index+1, r, map);
             // 받은 주문의 index번째에 해당하는 메뉴를 넣지 않고 다음 순서로 이동
             addCombtoMap(order, result, index+1, r, map);
         }
