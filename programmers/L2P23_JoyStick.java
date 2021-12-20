@@ -42,7 +42,7 @@ class Solution {
                 String prev = name.substring(1, i-count);
                 // i번째부터 남은 문자열은 뒷 문자열이 됩니다.
                 String next = name.substring(i, name.length());
-                // 앞, 뒤 문자열중 짧은 문자열이 곧 짧은 이동 횟수가 되므로 왕복할 문자열은 짧은 문자열을 선택합니다.
+                // 'A' 가 나오는 문자열을 제외한 나머지 앞, 뒤 문자열 중 짧은 문자열을 왕복이동 하며 긴 문자열은 편도 이동합니다.
                 moveCount = Math.min(moveCount, prev.length()+next.length()+Math.min(prev.length(), next.length()));
             }
         }
