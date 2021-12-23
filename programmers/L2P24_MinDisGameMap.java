@@ -1,3 +1,6 @@
+// 게임 맵 최단거리
+// https://programmers.co.kr/learn/courses/30/lessons/1844?language=java
+
 import java.util.*;
 
 class Solution {
@@ -40,7 +43,8 @@ class Solution {
                 }
             }
         }
-        
+
+        // map에서 이동할 수 있는 곳을 모두 방문한 경우 상대방 진영에 도달할 수 없으므로 -1을 return합니다.
         return -1;
     }
     
