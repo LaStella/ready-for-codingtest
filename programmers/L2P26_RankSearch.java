@@ -1,126 +1,83 @@
+// 순위 검색
+// https://programmers.co.kr/learn/courses/30/lessons/72412?language=java#
+
 import java.util.*;
 
 class Solution {
     public int[] solution(String[] info, String[] query) {
         int[] answer = new int[query.length];
-        String[][] infoArray = new String[info.length][];
-        String[][] queryArray = new String[query.length][];
+        // info의 4가지의 정보를 Key로, 코딩 테스트 점수를 ArrayList에 담아 Value로 저장합니다.
+        // ex) Key = javabackendjuniorpizza Value = [150]
+        HashMap<String, ArrayList> map = new HashMap<>();
         
-        ArrayList<Integer> applicant = new ArrayList<>();
-        HashMap<String, HashSet> map = new HashMap<>();
-        // ArrayList<Integer> score = new ArrayList<>();
-        // map.put("score", score);
-        int[] scoree = new int[info.length];
+        // 주어진 한 사람의 정보에서 만들 수 있는 모든 키에 대하여 값을 저장합니다.
+        // ex) Key = javabackendjuniorpizza, -backendjuniorpizza, ---juniorpizza ...
+        for(String s : info) {
+            String[] infoArray = s.split(" ");
+            dfsKey(infoArray, "", 0, map);
+        }
+        
+        Set<String> keySet = map.keySet();
+        for(String key : keySet) {
+            Collections.sort(map.get(key));    
+        }
+        
         
         int index = 0;
-        for(String s : info) {
-            applicant.add(index);
-            for(String t : s.split(" ")) {
-                if(Character.isDigit(t.charAt(0))) {
-                    scoree[index] = Integer.parseInt(t);
-                    // map.get("score").add(Integer.parseInt(t));
-                    continue;
-                }
-                if(map.containsKey(t)) {
-                    map.get(t).add(index);
-                }
-                else {
-                    HashSet<Integer> temp = new HashSet<>();
-                    temp.add(index);
-                    map.put(t, temp);
-                }
-            }
-            index++;
-        }
-        
-        // System.out.println(map);
-        
-        index = 0;
         for(String s : query) {
-            s = s.replaceAll("and ", "");
-            queryArray[index++] = s.split(" ");
-        }
-        
-        index = 0;
-        for(int i = 0 ; i < queryArray.length ; i++) {
-            HashSet<Integer> list = new HashSet<>(applicant);
-            
-            for(int j = 0 ; j < 4 ; j++) {
-                if(queryArray[i][j].equals("-")) {
-                    continue;
-                }
-                list.retainAll(map.get(queryArray[i][j]));
+            String[] queryArray = s.replaceAll(" and ", "").split(" ");
+            String key = queryArray[0];
+            int score = Integer.parseInt(queryArray[1]);
+
+            if(map.containsKey(key)) {
+                answer[index++] = binarySearch(map.get(key), score);
             }
-            
-            Iterator<Integer> it = list.iterator();
-            while(it.hasNext()) {
-                int idx = it.next();
-                // System.out.println(map.get("score").get(j));
-                // System.out.println(scoree[j]);
-                // System.out.println(queryArray[i][4]);
-                // System.out.println("!");
-                
-                
-                if(scoree[idx] < Integer.parseInt(queryArray[i][4])) {
-                    // System.out.println(scoree[j]);
-                    // System.out.println("!"+queryArray[i][4]);
-                    // System.out.println(j);
-                    it.remove();
-                }
+            else {
+                answer[index++] = 0;
             }
-            // System.out.println(list);
-            answer[index++] = list.size();
         }
-        
-//         for(int i = 0 ; i < info.length ; i++) {
-//             HashSet<String> set = new HashSet<>();
-//             for(int j = 0 ; j < 4 ; j++) {
-//                 set.add(infoArray[i][j]);
-//             }
-//             infoList.add(set);
-//         }
-        
-        
-        
-        // for(int i = 0 ; i < queryArray.length ; i++) {
-        //     int count = 0;
-        //     for(int j = 0 ; j < infoArray.length ; j++) {
-        //         boolean check = true;
-        //         for(int k = 0 ; k < 4 ; k++) {
-        //             if(queryArray[i][k].equals("-")) {
-        //                 continue;
-        //             }
-        //             if(!infoList.get(j).contains(queryArray[i][k])) {
-        //                 check = false;
-        //                 break;
-        //             }
-        //         }
-        //         if(check) {
-        //             if(Integer.parseInt(queryArray[i][4]) <= Integer.parseInt(infoArray[j][4])) {
-        //                 count++;    
-        //             }
-        //             else {
-        //                 check = false;
-        //             }
-        //         }
-        //     }
-        //     answer[i] = count;
-        // }
-        
-        // for(String[] s : infoArray) {
-        //     for(String t : s) {
-        //         System.out.println(t);
-        //     }
-        // }
-        
-        // for(String[] s : queryArray) {
-        //     for(String t : s) {
-        //         System.out.println(t);
-        //     }
-        // }
-        
-        
         
         return answer;
+    }
+    
+    // 깊이 우선 탐색 알고리즘을 사용하여 Key를 만들어 저장하는 함수입니다.
+    public void dfsKey(String[] s, String key, int depth, HashMap<String, ArrayList> map) {
+        // 정보는 총 4개 이므로 깊이가 4일 때 저장합니다.
+        if(depth == 4) {
+            int score = Integer.parseInt(s[4]);
+            // 이미 존재하는 Key라면 해당 Key에 해당하는 ArrayList를 가져와 점수를 저장합니다.
+            if(map.containsKey(key)) {
+                map.get(key).add(score);
+            }
+            // 새로운 Key라면 점수를 저장하는 ArrayList를 생성하여 점수를 저장한 후 Map에 저장합니다.
+            else {
+                ArrayList<Integer> scoreList = new ArrayList<>();
+                scoreList.add(score);
+                map.put(key, scoreList);
+            }
+        }
+        // 4개의 정보가 입력될 때까지 재귀호출합니다.
+        else {
+            dfsKey(s, key+"-", depth+1, map);
+            dfsKey(s, key+s[depth], depth+1, map);
+        }
+    }
+    
+    // 이진탐색 알고리즘을 사용하여 map에서 해당하는 Key에 대한 ArrayList로부터 score 점수 이상의 값의 개수를 return하는 함수입니다.
+    public int binarySearch(ArrayList<Integer> list, int score) {
+        int left = 0;
+        int right = list.size()-1;
+        
+        while(left <= right) {
+            int mid = (left + right)/2;
+            if(list.get(mid) < score) {
+                left = mid+1;
+            }
+            else {
+                right = mid-1;
+            }
+        }
+        
+        return list.size()-left;
     }
 }
