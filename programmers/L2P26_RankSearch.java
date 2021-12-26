@@ -17,18 +17,21 @@ class Solution {
             dfsKey(infoArray, "", 0, map);
         }
         
+        // map의 각 Key에 해당하는 점수 ArrayList를 오름차순으로 정렬합니다.
         Set<String> keySet = map.keySet();
         for(String key : keySet) {
             Collections.sort(map.get(key));    
         }
         
-        
+        // 주어진 query를 map의 Key와 동일한 형식으로 변환하여 해당하는 query의 점수 ArrayList를 가져옵니다.
         int index = 0;
         for(String s : query) {
             String[] queryArray = s.replaceAll(" and ", "").split(" ");
             String key = queryArray[0];
             int score = Integer.parseInt(queryArray[1]);
-
+            
+            // map에서 주어진 query를 Key로 사용하여 가져온 점수 ArrayList에서 이진탐색을 통해 score점수 이상인 지원자의 수를 계산합니다.
+            // 주어진 query가 map에 존재하지 않는다면 해당하는 지원자는 0명입니다.
             if(map.containsKey(key)) {
                 answer[index++] = binarySearch(map.get(key), score);
             }
