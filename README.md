@@ -83,4 +83,4 @@
 - [level2] 순위 검색
 - [level2] 후보키
 - [level2] 괄호 회전하기
-- [level2] 배달 -미완성
+- [level2] 배달
