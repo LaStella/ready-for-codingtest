@@ -84,3 +84,4 @@
 - [level2] 후보키
 - [level2] 괄호 회전하기
 - [level2] 배달
+- [level2] 위장
