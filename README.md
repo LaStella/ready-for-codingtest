@@ -89,3 +89,4 @@
 - [level2] H-Index
 - [level2] 카펫
 - [level2] 큰 수 만들기
+- [level2] 피로도
