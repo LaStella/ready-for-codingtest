@@ -1,121 +1,76 @@
+// 교점에 별 만들기
+// https://programmers.co.kr/learn/courses/30/lessons/87377?language=java
+
 import java.util.*;
 
 class Solution {
     public String[] solution(int[][] line) {
         String[] answer = {};
-        ArrayList<double[]> list = new ArrayList<>();
+        // x와 y의 좌표를 담을 List입니다.
         ArrayList<Integer> xlist = new ArrayList<>();
         ArrayList<Integer> ylist = new ArrayList<>();
-        // double a = 1.2;
-        // int b = 1;
-        // System.out.println((int)a == a);
-        int[] a = {2, -1, 4};
-        int[] b = {-2, -1, 4};
-        // System.out.println(getCrossing(a, b)[1]);
-        // list.add(getCrossing(a, b));
-        for(int i = 0 ; i < line.length ; i++) {
+        
+        // 직선들의 교점을 구합니다. 한 직선의 교점을 구하면 다음 직선은 이전 직선에서의 교점을 구할 필요가 없습니다.
+        for(int i = 0 ; i < line.length-1 ; i++) {
             for(int j = i+1 ; j < line.length ; j++) {
-                double[] cross = getCrossing(line[i], line[j]);
-                if(isInteger(cross)) {
-                    // System.out.println("i : "+i+" j : "+j);
-                    // System.out.println(cross[0]+" "+cross[1]);
-                    xlist.add((int)cross[0]);
-                    ylist.add((int)cross[1]);
-                }
+                getCrossPoint(line[i], line[j], xlist, ylist);
             }
         }
+
+        // 모든 별(교점 중 정수로 표현되는 좌표)을 포함하는 최소한의 크기로 나타내야 하므로
+        // 너비는 x좌표의 최대값-최소값+1, 높이는 y좌표의 최대값-최소값+1입니다.
         int width = Collections.max(xlist)-Collections.min(xlist)+1;
         int height = Collections.max(ylist)-Collections.min(ylist)+1;
-        int xmin = Math.abs(Collections.min(xlist));
-        int ymax = Math.abs(Collections.max(ylist));
+        int xmin = Collections.min(xlist);
+        int ymax = Collections.max(ylist);
         
+        // String배열 answer의 행을 y좌표, 문자열의 위치를 x좌표로 나타내야합니다.
+        // answer의 첫 글자가 0, 0이어야 하므로 교점들을 x축과 y축을 x의 최소값, y의 최대값만큼 움직여줍니다.
+        // y축으로 y의 최대값을 빼주면 음수가 나오므로 -을 곱하여 양수로 바꿔줍니다. (ylist.get(i)-ymax)*-1
         for(int i = 0 ; i < xlist.size() ; i++) {
-            xlist.set(i, xlist.get(i)+xmin);
-            ylist.set(i, ylist.get(i)-ymax);
-            // System.out.println(xlist.get(i)+" "+ylist.get(i));
+            xlist.set(i, xlist.get(i)-xmin);
+            ylist.set(i, ymax-ylist.get(i));
         }
-        // System.out.println(width+" "+height);
-        String[][] matrix = new String[height][width];
-        for(String[] m : matrix) {
-            Arrays.fill(m, ".");
-        }
-        // System.out.println(ylist.get(0)+ymin);
-        
-        // matrix[ylist.get(0)+ymin][xlist.get(0)+xmin] = "*";
-        
-        for(int i = 0 ; i < xlist.size() ; i++) {
-            matrix[Math.abs(ylist.get(i))][xlist.get(i)] = "*";
-            // System.out.println(xlist.get(i)+", "+ylist.get(i));
-        }
-        
-        // for(String[] m : matrix) {
-        //     System.out.println(String.join("", m));
-        //     // for(String s : m) {
-        //     //     System.out.print(s);
-        //     // }
-        // }
-        
         
         answer = new String[height];
-        for(int i = 0 ; i < height ; i++) {
-            answer[i] = String.join("", matrix[i]);
+
+        // 너비만큼 "." 으로 채웁니다.
+        for(int i = 0 ; i < answer.length ; i++) {
+            answer[i] = ".".repeat(width);
+        }
+
+        // "."으로 채워진 격자판에 교점의 위치에 해당하는 지점을 "*"로 바꿔줍니다.
+        for(int i = 0 ; i < xlist.size() ; i++) {
+            StringBuilder a = new StringBuilder(answer[ylist.get(i)]);
+            a.setCharAt(xlist.get(i), '*');
+            answer[Math.abs(ylist.get(i))] = a.toString();
         }
         
         return answer;
     }
     
-    
-    public double[] getCrossing(int[] line1, int[] line2) {
-        double[] result = {0.1, 0.1};
-        double a = line1[0];
-        double b = line1[1];
-        double c = line1[2];
-        double a2 = line2[0];
-        double b2 = line2[1];
-        double c2 = line2[2];
-        if(a == 0) {
-            if(a2 == 0) {
-                
-            }
-            else {
-                result[1] = -c/b;
-                result[0] = (-b2*result[1]-c2)/a2;
-            }
-        }
-        else if(b == 0) {
-            if(b2 == 0) {
-                
-            }
-            else {
-                result[0] = -c/a;
-                result[1] = (-a2*result[0]-c2)/b2;
-            }
+    // 교점을 구하는 함수입니다.
+    public void getCrossPoint(int[] line1, int[] line2, ArrayList<Integer> xlist, ArrayList<Integer> ylist) {
+        long a1 = line1[0];
+        long b1 = line1[1];
+        long c1 = line1[2];
+        long a2 = line2[0];
+        long b2 = line2[1];
+        long c2 = line2[2];
+        
+        long delta = a1 * b2 - a2 * b1;
+        long x = b1 * c2 - b2 * c1;
+        long y = a2 * c1 - a1 * c2;
+        // delta가 0인 경우 두 직선이 평행하므로 교점이 없습니다.
+        if(delta == 0) 
+            return ;
+        // delta로 나누어 떨어지지 않는다면 정수가 아닙니다.
+        if(x % delta != 0 || y % delta != 0) {
+            return ;
         }
         else {
-            if(a2 == 0) {
-                result[1] = -c2/b2;
-                result[0] = (-b*result[1]-c)/a;
-            }
-            else if(b2 == 0) {
-                result[0] = -c2/a2;
-                result[1] = (-a*result[0]-c)/a;
-            }
-            else {
-                // System.out.println("!");
-                result[0] = (c2-c*(b2/b))/(a*(b2/b)-a2);
-                result[1] = -a/b*result[0]-c/b;
-            }
+            xlist.add((int)(x / delta));
+            ylist.add((int)(y / delta));
         }
-        
-        // System.out.println(x);
-        // System.out.println(y);
-        return result;
-    }
-    
-    public boolean isInteger(double[] result) {
-        if((int)result[0] != result[0] || (int)result[1] != result[1]) {
-            return false;
-        }
-        return true;
     }
 }
