@@ -1,6 +1,7 @@
-import java.util.*;
 // 방문길이
 // https://programmers.co.kr/learn/courses/30/lessons/49994?language=java
+
+import java.util.*;
 
 class Solution {
     public int solution(String dirs) {
