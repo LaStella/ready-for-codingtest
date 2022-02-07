@@ -122,3 +122,4 @@
 - [level2] 피보나치 수
 - [level2] 행렬의 곱셈
 - [level2] JadenCase 문자열 만들기
+- [level2] N개의 최소공배수
