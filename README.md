@@ -124,3 +124,4 @@
 - [level2] JadenCase 문자열 만들기
 - [level2] N개의 최소공배수
 - [level2] 양궁대회
+- [level3] 추석 트래픽
