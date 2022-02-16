@@ -12,15 +12,22 @@ class Solution {
         for(int i = 0 ; i < sentence.length() ; i++) {
             Character key = sentence.charAt(i);
             if(Character.isLowerCase(key)) {
-                ArrayList<Integer> list = map.getOrDefault(key, new ArrayList<Integer>());
-                list.add(i);
-                map.put(key, list);
+                // ArrayList<Integer> list = map.getOrDefault(key, new ArrayList<Integer>());
+                // list.add(i);
+                // map.put(key, list);
+                if(!map.containsKey(key)) {
+                    map.put(key, new ArrayList<>());
+                }
+                map.get(key).add(i);
             }
         }
         
         int sentenceIndex = 0;
         int prevSIndex = -1;
         int prevEIndex = -1;
+        int prevWSIndex = -1;
+        int prevWEIndex = -1;
+        int prevRule = 0;
         String prevWord = "";
         
         for(char key : map.keySet()) {
@@ -28,55 +35,22 @@ class Solution {
             int count = list.size();
             int sIndex = list.get(0);
             int eIndex = list.get(count-1);
+            int wordSIndex, wordEIndex;
+            int rule = 0;
             String word = "";
             
+            // 소문자의 개수에 따라 규칙1과 규칙2를 구분합니다.
             if(count == 2) {
                 int interval = eIndex-sIndex;
                 // 간격이 2일 경우 규칙1과 규칙2 둘 다 가능
-                if(interval == 2) {
-                    if(prevSIndex < sIndex-1 && prevEIndex > eIndex+1) {
-                        sIndex = sIndex-1;
-                        eIndex = eIndex+1;
-                        // System.out.println("1"+getWord(sIndex, eIndex, sentence));
-                        word = getWord(sIndex, eIndex, sentence);
-                        if(!word.equals(prevWord)) {
-                            // invalid
-                            return answer = "invalid";
-                        }
-                        else {
-                            continue;
-                        }
-                        // rule 1
-                        // 이전 규칙안에 존재할 수 있는 규칙은 1번 규칙만 가능 (2번규칙 안에 1번규칙 존재가능, 1번규칙안에 2번규칙 존재불가능)      
-                    }
-                    else if(prevEIndex < sIndex) {
-                        // System.out.println("2"+getWord(sIndex, eIndex, sentence));
-                        word = getWord(sIndex, eIndex, sentence);
-                        // rule 2
-                        // 이전 규칙과 겹치지않는 범위라면 규칙2를 우선배정--임시 해제
-                    }
-                    else {
-                        // invalid
-                        return answer = "invalid";
-                    }
+                if(interval == 2 && prevSIndex < sIndex && prevEIndex > eIndex) {
+                    // 이전 규칙안에 존재할 수 있는 규칙은 1번 규칙만 가능 (2번규칙 안에 1번규칙 존재가능, 1번규칙안에 2번규칙 존재불가능)
+                    rule = 1;
+                    // System.out.println("1"+getWord(sIndex, eIndex, sentence));
                 }
                 // 간격이 2보다 크다면 규칙2만 가능
-                else if(interval > 2) {
-                    if(prevSIndex < sIndex && prevEIndex > eIndex) {
-                        // invalid
-                        // 이전 규칙안에 존재할 수 있는 규칙은 1번 규칙만 가능 (2번규칙 안에 1번규칙 존재가능, 1번규칙안에 2번규칙 존재불가능)
-                        return answer = "invalid";
-                    }
-                    else if(prevEIndex < sIndex) {
-                        // System.out.println("3"+getWord(sIndex, eIndex, sentence));
-                        word = getWord(sIndex, eIndex, sentence);
-                        // rule 2
-                    }
-                    else {
-                        // invalid
-                        return answer = "invalid";
-                    }
-                    // rule 2
+                else if(interval >= 2) {
+                    rule = 2;
                 }
                 // 간격이 2보다 작다면 소문자가 연속으로 나온 것이므로 불가능(규칙1,2모두 사이에 단어가 들어가기 때문)
                 else {
@@ -84,10 +58,10 @@ class Solution {
                     return answer = "invalid";
                 }
             }
-            // 규칙1만 가능
+            
+            // 소문자가 2개가 아니므로 규칙1만 가능합니다.
             else if(count == 1 || count >= 3) {
-                sIndex = sIndex-1;
-                eIndex = eIndex+1;
+                // 소문자사이의 간격을 확인합니다.
                 for(int i = 0 ; i < count-1 ; i++) {
                     if(list.get(i+1) - list.get(i) != 2) {
                         // invalid
@@ -95,32 +69,58 @@ class Solution {
                         return answer = "invalid";
                     }
                 }
-                if(prevSIndex < sIndex && prevEIndex > eIndex) {
-                    // System.out.println("4"+getWord(sIndex, eIndex, sentence));
-                    word = getWord(sIndex, eIndex, sentence);
-                    if(!word.equals(prevWord)) {
-                        // invalid
-                        return answer = "invalid";
-                    }
-                    else {
-                        continue;
-                    }
-                    // 이전 규칙 안에 포함되는 경우
-                }
-                else if(prevEIndex < sIndex) {
-                    // System.out.println("p"+prevEIndex);
-                    // System.out.println("s"+sIndex);
-                    // System.out.println("5"+getWord(sIndex, eIndex, sentence));
-                    word = getWord(sIndex, eIndex, sentence);
-                    // 이전 규칙과 겹치지 않는 경우
-                }
-                else {
-                    // invalid
-                    return answer = "invalid";
-                }
+                rule = 1;
             }
             
-            if(sentenceIndex < sIndex) {
+            // 규칙에 따라 규칙 적용 전의 단어로 가져옵니다.
+            // 규칙1은 첫번째 소문자보다 1작고 마지막 소문자보다 1큰 범위가 단어의 범위가 됩니다.
+            // System.out.println(rule);
+            if(rule == 1) {
+                wordSIndex = sIndex-1;
+                wordEIndex = eIndex+1;
+                // System.out.println(wordSIndex);
+                // System.out.println(wordEIndex);
+                if(prevWSIndex < wordSIndex && prevWEIndex > wordEIndex) {
+                    if(prevRule == 2) {
+                        // 같은 단어인지 확인
+                        word = getWord(wordSIndex, wordEIndex, sentence);
+                        if(!prevWord.equals(word)) {
+                            return "invalid";
+                        }
+                        else {
+                            continue;
+                        }
+                    }
+                    else {
+                        return "invalid";
+                    }
+                }
+                else if(prevWEIndex < wordSIndex) {
+                    word = getWord(wordSIndex, wordEIndex, sentence);
+                }
+                else {
+                    return "invalid";
+                }
+            }
+            // 규칙2은 첫번째 소문자와 마지막 소문자가 단어의 범위가 됩니다.
+            else {
+                wordSIndex = sIndex;
+                wordEIndex = eIndex;
+                // System.out.println(wordSIndex);
+                // System.out.println(wordEIndex);
+                if(prevWSIndex < wordSIndex && prevWEIndex > wordEIndex) {
+                    return "invalid";
+                }
+                else if(prevWEIndex < wordSIndex) {
+                    word = getWord(wordSIndex, wordEIndex, sentence);
+                }
+                else {
+                    return "invalid";
+                }
+                
+            }
+            
+            if(sentenceIndex < wordSIndex) {
                 // System.out.println(sentenceIndex);
                 // System.out.println(sIndex);
                 String remainWord = getWord(sentenceIndex, sIndex-1, sentence);
@@ -131,9 +131,12 @@ class Solution {
                 // sentence.substring(sentenceIndex, sIndex);
             }
             answerList.add(word);
-            sentenceIndex = eIndex+1;
+            sentenceIndex = wordEIndex+1;
             prevSIndex = sIndex;
             prevEIndex = eIndex;
+            prevWSIndex = wordSIndex;
+            prevWEIndex = wordEIndex;
+            prevRule = rule;
             prevWord = word;
         }
         if(sentenceIndex < sentence.length()) {
@@ -151,16 +154,10 @@ class Solution {
         return answer;
     }
     
-    public String getWord(int sIndex, int eIndex, String sentence) {
+    public String getWord(int wordSIndex, int wordEIndex, String sentence) {
         String result = "";
-        result = sentence.substring(sIndex, eIndex+1).replaceAll("[a-z]", "");
-        // if(rule == 1) {
-        //     result = sentence.substring(sIndex-1, eIndex+2).replaceAll("[a-z]", "");
-        // }
-        // // 시작인덱스+1, 끝인덱스-1이 단어의 범위입니다.
-        // else {
-        //     result = sentence.substring(sIndex+1, eIndex).replaceAll("[a-z]", "");
-        // }
+        
+        result = sentence.substring(wordSIndex, wordEIndex+1).replaceAll("[a-z]", "");
         
         return result;
     }
@@ -196,4 +193,11 @@ sIndex = 3
 eIndex = 7
 sentenceIndex = eIndex+1 = 8
 sIndex = 11
+
+
+
+
+
+
+bAaAb
 */
