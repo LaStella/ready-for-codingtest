@@ -140,3 +140,4 @@
 - [level3] 표 편집
 - [level3] 보석 쇼핑
 - [level3] 불량 사용자
+- [level3] GPS -미완
