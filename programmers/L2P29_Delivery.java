@@ -4,75 +4,78 @@
 import java.util.*;
 
 class Solution {
-    public int solution(int N, int[][] road, int K) {
-        int answer = 0;
-        // 1번 마을까지 최단 시간 값을 저장하는 배열입니다.
-        int[] shortest = new int[N];
-        // 각 마을을 방문했는지 확인하는 배열입니다.
-        boolean[] visited = new boolean[N];
-   
-        answer = dijkstra(visited, shortest, road, K);
-
+    public int solution(int n, int s, int a, int b, int[][] fares) {
+        // 최대 요금 = 지점갯수 최대(출발지 포함 200) 199 * 최대 비용 100000
+        int answer = 19900001;
+        // 간선을 양방향으로 저장합니다.
+        int[][] nfares = new int[n][n];
+        for(int[] fare : fares) {
+            nfares[fare[0]-1][fare[1]-1] = fare[2];
+            nfares[fare[1]-1][fare[0]-1] = fare[2];
+        }
+        
+        // 출발 지점으로부터 모든 지점으로 가는 최소 요금 배열입니다.
+        int[] distance_start = dijkstra(n, s-1, nfares);
+        
+        // 출발 지점 s로 부터 합승하여 이동한 지점을 i라고 할 때,
+        // 총 요금 = (s -> i 요금) + (i -> a 요금) + (i -> b 요금) 이 됩니다.
+        // 단, 지점은 0부터 시작하므로 s, a, b는 -1을 하게됩니다.
+        for(int i = 0 ; i < n ; i++) {
+            // 합승하여 이동한 지점 i로부터 모든 지점으로 가는 최소 요금 배열입니다.
+            int[] distance_i = dijkstra(n, i, nfares);
+            
+            answer = Math.min(answer, distance_start[i]+distance_i[a-1] + distance_i[b-1]);
+        }
+        
         return answer;
     }
     
-    // 다익스트라 알고리즘을 사용하여 최단 거리를 저장하는 함수입니다.
-    public int dijkstra(boolean[] visited, int[] shortest, int[][] road, int K) {
-        int count = 0;
-        // 최단 시간 배열을 초기화 해줍니다.
-        // 시작마을은 0으로, 나머지 마을까지의 거리는 최대치로 초기화합니다.
-        Arrays.fill(shortest, 500001);
-        shortest[0] = 0;
+    
+    // 출발지 s로부터 모든 지점으로의 최소 요금을 계산하는 함수입니다.
+    public int[] dijkstra(int n, int s, int[][] nfares) {
+        // 시작 지점s로부터 모든 지점으로 가는 최소 요금을 저장할 배열입니다.
+        // 시작 지점은 비용을 0으로, 나머지 지점은 최대치로 초기화해줍니다.
+        int[] distance = new int[n];
+        boolean[] visited = new boolean[n];
+        Arrays.fill(distance, 19900001);
+        distance[s] = 0;
         
-        // 모든 마을을 방문하면 종료됩니다.
-        // 여기서 간선의 방향은 존재하지 않으므로 마지막 마을은 방문하지 않아도 됩니다. (양방향 간선)
-        for(int i = 0 ; i < visited.length-1 ; i++) {
-            // 방문하지 않은 마을 중 최단 시간을 가지는 마을의 번호를 가져옵니다. (이하 최단 마을이라 함)
-            // 1번 마을은 0, 2번 마을은 1, n번 마을은 n-1의 index를 나타냅니다.
-            int minIndex = getMinIndex(visited, shortest);
-            // 최단 마을을 방문 처리합니다.
+        // 모든 지점을 방문하면 종료되며 두 지점 사이의 경로는 일방통행이 아니므로 마지막 지점은 방문하지 않아도 됩니다.
+        for(int i = 0 ; i < n - 1 ; i++) {
+            // 최소 요금이 드는 지점을 찾습니다. (이하, 최소 요금 지점이라함)
+            int minIndex = getMinIndex(distance, visited);
+            // 찾은 지점을 방문처리합니다.
             visited[minIndex] = true;
-            // 최단 마을과 연결된 모든 간선의 시간을 업데이트합니다.
-            for(int[] arr : road) {
-                // 문제에서 주어진 간선은 두 마을의 번호가 정렬되어 있지 않으므로 간선의 두 마을 번호 모두 확인합니다.
-                if(arr[0]-1 == minIndex) {
-                    // 최소 마을과 연결된 간선의 거리를 비교합니다.
-                    // 기존의 최단 시간 보다 작을 경우에 저장합니다.
-                    // 기존 최단 시간 > 최단 마을 시간 + 간선 시간
-                    if(shortest[arr[1]-1] > shortest[minIndex]+arr[2]) {
-                        shortest[arr[1]-1] = shortest[minIndex]+arr[2];
-                    }
+            // 모든 간선들 중 찾은 지점과 연결된 간선을 찾습니다.
+            // fare[0]-1 : 간선 시작 지점 / fare[1]-1 : 간선 도착 지점 / fare[2] : 간선 비용
+            for(int j = 0 ; j < n ; j++) {
+                if(nfares[minIndex][j] != 0) {
+                    distance[j] = Math.min(distance[j], distance[minIndex] + nfares[minIndex][j]);
                 }
-                // 위와 동일하며 간선의 두 마을 번호가 역순으로 되어있는 경우입니다.
-                else if(arr[1]-1 == minIndex) {
-                    if(shortest[arr[0]-1] > shortest[minIndex]+arr[2]) {
-                        shortest[arr[0]-1] = shortest[minIndex]+arr[2];
-                    }
-                }
-            }
+            }   
         }
         
-        // 최단 시간 배열에서 문제에서 요구한 K시간 이하의 마을의 개수를 셉니다.
-        for(int i : shortest) {
-            if(i <= K) {
-                count++;
-            }
-        }
-        
-        return count;
+        return distance;
     }
     
-    // 방문하지 않은 마을 중 최단 시간 마을의 번호를 return하는 함수입니다.
-    public int getMinIndex(boolean[] visited, int[] shortest) {
-        int min = 500001;
-        int index = 0;
-        
-        for(int i = 0 ; i < shortest.length ; i++) {
-            if(!visited[i] && shortest[i] < min) {
-                min = shortest[i];
-                index = i;
+    // 방문하지 않은 거점 중 최소 요금이 드는 지점을 리턴하는 함수입니다.
+    public int getMinIndex(int[] distance, boolean[] visited) {
+        int min = 19900001;
+        int minIndex = 0;
+        for(int i = 0 ; i < distance.length ; i++) {
+            // 방문하지 않은 거점 중 최소 비용이 드는 거점을 찾습니다.
+            if(!visited[i] && distance[i] < min) {
+                min = distance[i];
+                minIndex = i;
             }
         }
-        return index;
+        
+        return minIndex;
     }
 }
+
+
+/*
+시작지점 s부터 합승구간을 k지점까지 감 (k는 시작 포함 모든 지점이 가능)
+k지점에서 각자 도착지점까지 최소 거리를 더함 
+*/
