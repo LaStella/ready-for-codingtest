@@ -9,6 +9,7 @@ class Solution {
         
         // 보와 기둥을 설치할 3차원 배열입니다.
         // [x좌표][y좌표][보와 기둥]
+        // build_frame에서 x,y좌표는 n까지 주어지며 x+1, y+1좌표로 접근이 용이하도록(board[n+1][n+1] 에 접근이 가능하도록) n+2크기의 배열을 만듭니다.
         int[][][] board = new int[n+2][n+2][2];
         
         for(int[] build : build_frame) {
@@ -30,9 +31,11 @@ class Solution {
             }
         }
         
+        // 설치한 구조물의 개수만큼 배열을 만듭니다.
         answer = new int[frame_count][3];
         int index = 0;
 
+        // answer배열에 설치된 구조물의 좌표와 구조물의 종류를 저장합니다.
         for(int x = 0 ; x <= n ; x++) {
             for(int y = 0 ; y <= n ; y++) {
                 for(int i = 0 ; i < 2 ; i++) {
@@ -46,96 +49,120 @@ class Solution {
         return answer;
     }
     
-    // 기둥을 설치하는 함수입니다.
-    public void addPillar(int[][][] board, int x, int y) {
-        // 기둥을 설치하려는 곳이 바닥이 아니면서
-        if(y != 0) {
-            // 기둥을 지지할 기둥이 없으며
-            if(y-1 >= 0 && board[x][y-1][0] != 1) {
-                // 기둥을 지지할 보가 없다면 설치할 수 없습니다.
-                if(x-1 >= 0 && board[x-1][y][1] != 1 && board[x][y][1] !=1) {
-                    return;
-                }    
-            }
+    // 기둥이 존재할 수 있는지 확인하는 함수입니다.
+    public boolean checkPossiblePillar(int[][][] board, int x, int y) {
+        // 기둥이 바닥위에 있으면 존재할 수 있습니다.
+        if(y == 0) return true;
+        else {
+            // 기둥이 보의 한쪽 끝 부분 위에 있으면 존재할 수 있습니다.
+            if((x-1 >= 0 && board[x-1][y][1] == 1) || board[x][y][1] == 1) return true;
+            // 기둥이 다른 기둥 위에 있으면 존재할 수 있습니다.
+            if(board[x][y-1][0] == 1) return true;
         }
         
-        board[x][y][0] = 1;
-        frame_count++;
+        return false;
+    }
+    
+    // 보가 존재할 수 있는지 확인하는 함수입니다.
+    public boolean checkPossibleFloor(int[][][] board, int x, int y) {
+        // 보의 한 끝 부분이 기둥위에 있으면 존재할 수 있습니다.
+        if(board[x][y-1][0] == 1 || board[x+1][y-1][0] == 1) return true;
+        // 보의 양쪽 끝 부분이 다른 보와 동시에 연결되면 존재할 수 있습니다.
+        if((x-1 >= 0 && board[x-1][y][1] == 1) && board[x+1][y][1] == 1) return true;
+        
+        return false;
+    }
+    
+    // 기둥을 설치하는 함수입니다.
+    public void addPillar(int[][][] board, int x, int y) {
+        // 기둥이 존재할 수 있는지 확인하여 가능하면 설치합니다.
+        if(checkPossiblePillar(board, x, y)) {
+            board[x][y][0] = 1;
+            frame_count++;
+        }
     }
     
     // 기둥을 삭제하는 함수입니다.
     public void removePillar(int[][][] board, int x, int y) {
-        // 삭제하려는 기둥 위에 기둥이 있을 경우
+        // 기둥을 삭제합니다.
+        board[x][y][0] = 0;
+        
+        // 삭제한 기둥 위에 기둥이 있을 경우
         if(board[x][y+1][0] == 1) {
-            // 위에 있는 기둥을 지지할 보가 없다면 삭제할 수 없습니다.
-            if(board[x][y+1][1] != 1 && board[x-1][y+1][1] != 1) {
+            // (x, y+1)기둥이 존재할 수 있는지 확인하여 존재할 수 없다면 (x, y)기둥을 복구하고, 삭제를 하지 않습니다.
+            if(!checkPossiblePillar(board, x, y+1)) {
+                board[x][y][0] = 1;
                 return;
             }
         }
-        // 삭제하려는 기둥 위에 보가 있을 경우
+        
+        // 삭제한 기둥 위에 오른쪽으로 보가 있을 경우
         if(board[x][y+1][1] == 1) {
-            // 위에 있는 보를 지지할 기둥이 없고
-            if(board[x+1][y][0] != 1) {
-                // 위에 있는 보를 지지할 양 옆 보가 없다면 삭제할 수 없습니다.
-                if(x-1 >= 0 && board[x-1][y+1][1] != 1 && board[x+1][y+1][1] != 1) {
-                    return;
-                }       
+            // 보가 존재할 수 있는지 확인하여 존재할 수 없다면 기둥을 복구하고, 삭제를 하지 않습니다.
+            if(!checkPossibleFloor(board, x, y+1)) {
+                board[x][y][0] = 1;
+                return;
             }
         }
-        board[x][y][0] = 0;
+        
+        // 삭제한 기둥 위에 왼쪽으로 보가 있을 경우
+        if(x-1 >= 0 && board[x-1][y+1][1] == 1) {
+            // 위와 동일합니다.
+            if(!checkPossibleFloor(board, x-1, y+1)) {
+                board[x][y][0] = 1;
+                return;
+            }
+        }
+        
         frame_count--;
     }
     
     // 보를 설치하는 함수입니다.
     public void addFloor(int[][][] board, int x, int y) {
-        // 보를 지지할 기둥이 없는지 확인합니다.
-        if(y-1 >= 0 && board[x][y-1][0] != 1 && board[x+1][y-1][0] != 1) {
-            // 보를 지지할 양 옆 보가 없는지 확인합니다.
-            if(x-1 >= 0 && board[x-1][y][1] != 1 && board[x+1][y][1] != 1) {
-                return;
-            }
+        // 보가 존재할 수 있는지 확인하여 가능하면 설치합니다.
+        if(checkPossibleFloor(board, x, y)) {
+            board[x][y][1] = 1;
+            frame_count++;    
         }
-        board[x][y][1] = 1;
-        frame_count++;
     }
     
     // 보를 삭제하는 함수입니다.
     public void removeFloor(int[][][] board, int x, int y) {
-        // 삭제하려는 보의 왼쪽에 보가 있을 경우
-        if(x-1 >= 0 && board[x-1][y][1] == 1) {
-            // 왼쪽에 있는 보를 지지할 기둥이 없다면 삭제할 수 없습니다.
-            if(y-1 >= 0 && board[x-1][y-1][0] != 1) {
-                return;
-            }
-        }
-        // 삭제하려는 보의 오른쪽에 보가 있는 경우
-        if(board[x+1][y][1] == 1) {
-            // 오른쪽에 있는 보를 지지할 기둥이 없다면 삭제할 수 없습니다.
-            if(y-1 >= 0 && board[x+1][y-1][0] != 1) {
-                return;
-            }
-        }
-        // 삭제하려는 보의 오른쪽에 기둥이 있는 경우
-        if(board[x+1][y][0] == 1) {
-            // 오른쪽에 있는 기둥을 지지할 기둥이 없고
-            if(y-1 >= 0 && board[x+1][y-1][0] != 1) {
-                // 오른쪽에 있는 기둥을 지지할 보가 없다면 삭제할 수 없습니다.
-                if(board[x+1][y][1] != 1) {
-                    return;
-                }
-            }
-        }
+        // 보를 삭제합니다.
         board[x][y][1] = 0;
+        
+        // 삭제한 보의 왼쪽으로 보가 있을 경우
+        if(x-1 >= 0 && board[x-1][y][1] == 1) {
+            if(!checkPossibleFloor(board, x-1, y)) {
+                board[x][y][1] = 1;
+                return;
+            }
+        }
+        
+        // 삭제한 보의 오른쪽으로 보가 있을 경우
+        if(board[x+1][y][1] == 1) {
+            if(!checkPossibleFloor(board, x+1, y)) {
+                board[x][y][1] = 1;
+                return;
+            }
+        }
+        
+        // 삭제한 보의 왼쪽 끝에 기둥이 있을 경우
+        if(board[x][y][0] == 1) {
+            if(!checkPossiblePillar(board, x, y)) {
+                board[x][y][1] = 1;
+                return;
+            }
+        }
+        
+        // 삭제한 보의 오른쪽 끝에 기둥이 있을 경우
+        if(board[x+1][y][0] == 1) {
+            if(!checkPossiblePillar(board, x+1, y)) {
+                board[x][y][1] = 1;
+                return;
+            }
+        }
+        
         frame_count--;
     }
 }
-
-/*
-한 좌표에 대해 기둥, 보가 존재할 수 있음
-기둥 설치시(x,y,0,1) > y=0 설치,  y=0이아닐경우 (x-1, y)에 보 유무 확인
-보 설치시(x,y,1,1) > (x,y-1)에 기둥 유무 확인 > (x-1,y)와 (x+1,y)에 보 유무 확인
-
-보 삭제시(x,y,1,0) > (x-1, y)에 보가 있는지 확인> 있다면 (x-1, y-1)에 기둥 유무 확인
-                    (x+1, y)에 보가 있는지 확인> 있다면 (x+1, y-1)기둥 유무 확인
-                    (x+1, y)에 기둥이 있는지 확인 > 있다면 (x+1, y)에 보 유무 확인 또는 (x+1, y-1) 에 기둥 유무 확인
-*/
