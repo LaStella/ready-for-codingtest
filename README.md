@@ -55,6 +55,8 @@
 - [level1] 행렬의 덧셈
 - [level1] x만큼 간격이 있는 n개의 숫자
 - [level1] 직사각형 별찍기
+- [level1] 신고 결과 받기
+
 - [level2] 문자열 압축
 - [level2] 오픈채팅방 [링크](https://velog.io/@lastella/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%97%B0%EC%8A%B5-%EC%98%A4%ED%94%88%EC%B1%84%ED%8C%85%EB%B0%A9)
 - [level2] 카카오프렌즈 컬러링북
@@ -124,6 +126,7 @@
 - [level2] JadenCase 문자열 만들기
 - [level2] N개의 최소공배수
 - [level2] 양궁대회
+
 - [level3] 추석 트래픽
 - [level3] N으로 표현
 - [level3] 입국심사
