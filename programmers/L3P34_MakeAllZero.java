@@ -1,60 +1,85 @@
 // 모두 0으로 만들기
 // https://programmers.co.kr/learn/courses/30/lessons/76503?language=java#
 
+import java.util.*;
+
 class Solution {
-    long answer = -1;
+    long answer = 0;
     public long solution(int[] a, int[][] edges) {
-        boolean[] visited = new boolean[edges.length];
+        boolean[][] exist_edges = new boolean[a.length][a.length];
+        ArrayList<Node> node_list = new ArrayList<>();
+        boolean[] visited = new boolean[a.length];
         
-        dfs(a, edges, 0, 0, visited, "");
-        
-        return answer;
-    }
-    
-    public void dfs(int[] a, int[][] edges, int depth, int result, boolean[] visited, String test) {
-        if(depth == edges.length) {
-            for(int i = 0 ; i < a.length ; i++) {
-                if(a[i] != 0) return;
-            }
-            if(answer == -1) {
-                answer = result;
-            }
-            if(result < answer) answer = result;
-            System.out.println(test);
+        for(int[] edge : edges) {
+            exist_edges[edge[0]][edge[1]] = true;
+            exist_edges[edge[1]][edge[0]] = true;
         }
-        else {
-            for(int i = 0 ; i < edges.length ; i++) {
-                if(!visited[i]) {
-                    visited[i] = true;
-                    int u = edges[i][0];
-                    int v = edges[i][1];
-                    int au = a[u];
-                    int av = a[v];
-                    int auv = a[u]+a[v];
-                    if(au == 0 && av == 0) {
-                        dfs(a, edges, depth+1, result, visited, test+i);
-                    }
-                    else if(auv == 0) {
-                        a[u] = 0;
-                        a[v] = 0;
-                        dfs(a, edges, depth+1, result+Math.abs(av), visited, test+i+"n");
-                    }
-                    else {
-                        // u의 가중치 증가, v의 가중치 감소
-                        a[u] = auv;
-                        a[v] = 0;
-                        dfs(a, edges, depth+1, result+Math.abs(av), visited, test+i+"u");
-                        // u의 가중치 감소, v의 가중치 증가
-                        a[u] = 0;
-                        a[v] = auv;
-                        dfs(a, edges, depth+1, result+Math.abs(au), visited, test+i+"v");
-                    }
-                    a[u] = au;
-                    a[v] = av;
-                    visited[i] = false;
+        
+        int max_index = 0;
+        int max_value = 0;
+        
+        for(int i  = 0 ; i < a.length ; i++) {
+            node_list.add(new Node(i, a[i]));
+            if(Math.abs(a[i]) > max_value) {
+                max_index = i;
+                max_value = Math.abs(a[i]);
+            }
+        }
+        
+        
+        
+        Queue<Node> q = new LinkedList<>();
+        q.add(node_list.get(max_index));
+        
+        while(!q.isEmpty()) {
+            Node p_node = q.poll();
+            visited[p_node.index] = true;
+            for(int i = 0 ; i < a.length ; i++) {
+                if(exist_edges[p_node.index][i] && !visited[i]) {
+                    q.add(node_list.get(i));
+                    p_node.child_list.add(node_list.get(i));
                 }
             }
         }
         
+        if(postorder(node_list.get(max_index)) != 0) {
+            answer = -1;
+        }
+        
+        return answer;
+    }
+    
+    public int postorder(Node head) {
+        if(head.child_list.size() != 0) {
+            for(Node child : head.child_list) {
+                int child_weight = postorder(child);
+                answer += Math.abs(child_weight);
+                head.weight += child_weight;
+            }
+        }
+        
+        return head.weight;
     }
 }
+
+class Node {
+    int index;
+    int weight;
+    ArrayList<Node> child_list;
+    
+    public Node(int index, int weight) {
+        this.index = index;
+        this.weight = weight;
+        child_list = new ArrayList<>();
+    }
+}
+
+
+
+/*
+트리 형성
+자식들부터 차례로 순회 
+헤드는 절대값이 가장큰것
+
+
+*/
