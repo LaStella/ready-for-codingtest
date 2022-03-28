@@ -1,84 +1,65 @@
 // 섬 연결하기
 // https://programmers.co.kr/learn/courses/30/lessons/42861?language=java
 
+// 핵심 : 크루스칼 알고리즘(Kruskal Algorithm)사용
+
 import java.util.*;
 
 class Solution {
-    int answer;
     public int solution(int n, int[][] costs) {
-        answer = Integer.MAX_VALUE;
-        // 두 섬 사이의 다리 여부를 저장할 배열입니다.
-        boolean[][] bridge = new boolean[n][n];
-        // 건설할 다리의 방문 여부를 저장할 배열입니다.
-        boolean[] visited = new boolean[costs.length];
+        int answer = 0;
+        int[] parent = new int[n];
+        int bridge_count = 0;
         
-        comb(0, 0, costs, bridge, visited);
+        // 건설할 다리를 비용순으로 정렬합니다.
+        Arrays.sort(costs, (o1, o2) -> o1[2] - o2[2]);
+        
+        // 모든 섬들의 부모를 자신으로 초기화합니다. (섬의 집합을 만드는 과정입니다.)
+        for(int i = 0 ; i < n ; i++) {
+            parent[i] = i;
+        }
+        
+        // 비용이 작은 다리부터 건설할지 확인합니다.
+        for(int[] cost : costs) {
+            // 다리가 건설되는 두 섬(u, v)의 부모섬(섬 집합의 꼭대기)을 찾습니다.
+            int u_parent = find(cost[0], parent);
+            int v_parent = find(cost[1], parent);
+            
+            // 두 섬의 부모가 서로 같은 경우 통행이 가능하므로 건설할 필요가없습니다.
+            // 두 섬의 부모가 서로 다른 경우 다리를 건설하여 두 섬 집합을 이어줍니다.
+            if(u_parent != v_parent) {
+                answer += cost[2];
+                union(u_parent, v_parent, parent);
+                // 모든 섬이 서로 통행하는데 필요한 다리는 n-1개이므로 필요한 다리가 모두 건설되면 중단합니다.
+                if(++bridge_count == n-1) break;
+            }
+        }
         
         return answer;
     }
     
-    // 두 섬 사이에 건설할 다리를 costs에서 뽑는 조합을 찾는 함수입니다.
-    public void comb(int result, int depth, int[][] costs, boolean[][] bridge, boolean[] visited) {
-        // 찾은 조합 중 모든 섬이 서로 통행 가능한 경우 건설 비용을 비교하여 최소 비용을 저장합니다.
-        if(check(bridge)) {
-            answer = Math.min(answer, result);
+    // 두 집합의 섬을 하나의 집합으로 합치는 함수입니다.
+    public void union(int u, int v, int[] parent) {
+        // 두 부모섬 중 번호가 작은 섬을 부모로 합니다. (부모섬을 정하는 규칙이므로 번호가 큰 섬을 부모로 하여도 상관없습니다.)
+        if(u > v) {
+            parent[u] = v;
         }
-        // 건설 가능한 모든 다리를 보았을 경우 종료합니다.
-        else if(depth == costs.length) {
-            return;
-        }
-        // 건설 가능한 다리의 조합을 찾습니다.
         else {
-            int u = costs[depth][0];
-            int v = costs[depth][1];
-            
-            visited[depth] = true;
-            bridge[u][v] = true;
-            bridge[v][u] = true;
-            // depth번에 해당하는 다리를 건설하는 경우
-            comb(result+costs[depth][2], depth+1, costs, bridge, visited);
-            visited[depth] = false;
-            bridge[u][v] = false;
-            bridge[v][u] = false;
-            // depth번에 해당하는 다리를 건설하지 않는 경우
-            comb(result, depth+1, costs, bridge, visited);
+            parent[v] = u;
         }
     }
     
-    // 모든 섬이 서로 통행 가능한지 확인하는 함수입니다.
-    public boolean check(boolean[][] bridge) {
-        int n = bridge.length;
-        Queue<Integer> q = new LinkedList<>();
-        boolean[] visited = new boolean[n];
-
-        // 0번 섬을 q에 넣습니다. (아무 섬을 넣어도 상관없습니다)
-        q.add(0);
-        while(!q.isEmpty()) {
-            int p_index = q.poll();
-            // 뽑힌 섬(p_index번 섬)의 방문여부를 저장합니다.
-            visited[p_index] = true;
-            // 뽑힌 섬과 연결된 섬이고 아직 방문하지 않은 섬이면 q에 넣습니다.
-            for(int i = 0 ; i < n ; i++) {
-                if(bridge[p_index][i] == true && !visited[i]) {
-                    q.add(i);
-                }
-            }
+    // 주어지는 index번 섬이 속한 집합의 부모섬을 찾는 함수입니다.
+    public int find(int index, int[] parent) {
+        if(parent[index] == index) {
+            return index;
         }
-        
-        // 모든 섬을 방문한 경우 true를 리턴하며 방문하지 못한 섬이 있다면 false리턴합니다.
-        for(int i = 0 ; i < n ; i++) {
-            if(!visited[i]) return false;
+        else {
+            return find(parent[index], parent);
         }
-        
-        return true;
     }
-    
 }
 
-
 /*
-조합으로 다리를 선택
-하나의 정점을 방문해 모든 정점으로 연결되는지 확인
-해당 정점으로 연결이 되어있다면 모든 정점으로 이동이 가능한것을 의미하므로
-
+크루스칼 이용
 */
