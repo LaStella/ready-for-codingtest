@@ -9,57 +9,54 @@ class Solution {
         
         for(int i = 0 ; i < s.length ; i++) {
             String x = s[i];
+            
+            // 만들어질 수 있는 모든 110의 개수를 셉니다.
+            // 연속하는 1의 개수를 세며, 0과 연속하는 1이 2개 이상일 경우 110이 됩니다.
+            // 110이 만들어지는 경우를 제외한 나머지는 스택에 저장됩니다.
+            Stack<Character> stack = new Stack<>();
             int count = 0;
+            int count_one = 0;
             
-            // 만들어질 수 있는 모든 110을 제거합니다.
-            while(x.contains("110")) {
-                count++;
-                int index = x.indexOf("110");
-                x = x.substring(0, index)+x.substring(index+3, x.length());
-            }
-            
-            while(count > 0) {
-                int count_one = 0;
-                for(int j = 0 ; j < x.length() ; j++) {
-                    if(x.charAt(j) == '1') {
-                        count_one++;
-                        if(count_one == 3) {
-                            System.out.println(j);
-                            x = x.substring(0, j-2)+"110"+x.substring(j-2, x.length());
-                            count--;
-                            break;
-                        }
+            for(int j = 0 ; j < x.length() ; j++) {
+                if(x.charAt(j) == '1') {
+                    count_one++;
+                    stack.push(x.charAt(j));
+                }
+                else {
+                    if(count_one >= 2) {
+                        stack.pop();
+                        stack.pop();
+                        count_one -= 2;
+                        count++;
                     }
                     else {
                         count_one = 0;
-                    }
-                    if(j == x.length()-1) {
-                        x = x.substring(0, j-(count_one-1))+"110"+x.substring(j-(count_one-1), x.length());
-                        count--;
-                        break;
+                        stack.push(x.charAt(j));
                     }
                 }
             }
             
-            answer[i] = x;
+            // 스택에 남아있는 문자를 가져와 문자열(sb)을 만듭니다.
+            StringBuilder sb = new StringBuilder();
+            while(!stack.isEmpty()) {
+                sb.append(stack.pop());
+            }
+            sb.reverse();
+            
+            // 만든 문자열(sb)에 마지막으로 나오는 0의 뒤에 110을 삽입합니다. (0보다 앞에 삽입하면 사전 순으로 더 앞에오는 문자열이 아니므로)
+            // 마지막으로 나오는 0의 뒤에 계속해서 110을 삽입하게 되면 결국 110을 count만큼 반복한 문자열을 삽입하게 됩니다.
+            // 문자열(sb)에 0이 없다면, 문자열의 제일 앞에 110을 반복한 문자열을 삽입합니다.
+            int index = sb.lastIndexOf("0");
+            if(index != -1) {
+                sb.insert(index+1, "110".repeat(count));
+            }
+            else {
+                sb.insert(0, "110".repeat(count));
+            }
+            
+            answer[i] = sb.toString();
         }
         
         return answer;
     }
 }
-
-/*
-110을 찾아서 분리
-분리된 문자열에서 앞에서부터 차례로 1을 찾음
-1이 연속으로 3번 나오는 경우 해당 자리에 110을 삽입
-1이 연속으로 3번 나오는 경우가 없는 경우 마지막에서 
-
-01100111
-01101100111
-01100110111
-
-
-010011
-010011110
-010011011
-*/
