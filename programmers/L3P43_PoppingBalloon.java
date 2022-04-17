@@ -3,8 +3,31 @@
 
 class Solution {
     public int solution(int[] a) {
-        int answer = 0;
+        int answer = a.length;
+        
+        for(int i = 0 ; i < a.length ; i++) {
+            if(checkLeft(i, a) && checkRight(i, a)) {
+                answer--;
+            }
+        }
+        
+        
         return answer;
+    }
+    
+    public boolean checkLeft(int index, int[] a) {
+        for(int i = 0 ; i < index ; i++) {
+            if(a[index] > a[i]) return true;
+        }
+        
+        return false;
+    }
+    public boolean checkRight(int index, int[] a) {
+        for(int i = index+1 ; i < a.length ; i++) {
+            if(a[index] > a[i]) return true;
+        }
+        
+        return false;
     }
 }
 
