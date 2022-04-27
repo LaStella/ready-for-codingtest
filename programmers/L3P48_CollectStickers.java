@@ -4,37 +4,38 @@
 import java.util.*;
 
 class Solution {
-    int N;
-    int answer;
     public int solution(int sticker[]) {
-        answer = 0;
-        N = sticker.length;
-        // 뜯어내거나 찢어진 스티커가 저장되는 set입니다.
-        HashSet<Integer> set = new HashSet<>();
+        int answer = 0;
+        int N = sticker.length;
         
-        dfs(0, 0, sticker, set, "");
-
+        int[] max = new int[N];
+        int[] n_max = new int[N];
+        
+        if(N == 1) return sticker[0];
+        
+        // 첫번째 스티커를 뜯으므로 max[1]은 sticker[1]를 뜯을 수 없기 때문에 max[0]의 값이 됩니다.
+        max[0] = sticker[0];
+        max[1] = max[0];
+        // 첫번째 스티커와 마지막 스티커는 같이 뜯을 수 없으므로 N-2까지 반복합니다.
+        for(int i = 2 ; i < N-1 ; i++) {
+            max[i] = Math.max(max[i-1], max[i-2]+sticker[i]);
+        }
+        
+        // 첫번째 스티커를 뜯지 않으므로 max[0]은 0이며, max[1]은 sticker[1]을 뜯을 수 있기 때문에 max[1]의 값이 됩니다.
+        n_max[0] = 0;
+        n_max[1] = sticker[1];
+        // 마지막 스티커를 뜯을 수 있으므로 N-1까지 반복합니다.
+        for(int i = 2 ; i < N ; i++) {
+            n_max[i] = Math.max(n_max[i-1], n_max[i-2]+sticker[i]);
+        }
+        
+        answer = Math.max(max[N-2], n_max[N-1]);
+        
         return answer;
     }
-    
-    public void dfs(int result, int depth, int[] sticker, HashSet<Integer> set, String r) {
-        // 모든 스티커가 뜯어지거나 찢어졌다면 결과를 비교합니다.
-        if(depth >= N) {
-            answer = Math.max(answer, result);
-        }
-        else {
-            // 뜯거나 찢어지지 않은 스티커는 뜯습니다.
-            if(!set.contains(depth)) {
-                HashSet<Integer> clone_set = new HashSet<>(set);
-                // 뜯어낸 스티커와 양쪽으로 인접한 찢어진 스티커를 저장합니다.
-                clone_set.add(depth);
-                clone_set.add((depth-1+N)%N);
-                clone_set.add((depth+1)%N);
-                // 스티커를 뜯어내서 양쪽 스티커는 사용할 수 없으므로 depth+2를 하여 사용할 수 없는 스티커를 건너뜁니다.
-                dfs(result+sticker[depth], depth+2, sticker, clone_set, r+depth);
-            }
-            // 스티커를 뜯지 않고 다음 스티커로 넘어갑니다.
-            dfs(result, depth+1, sticker, set, r);
-        }
-    }
 }
+
+/*
+첫번째 스티커를 뜯는 경우와 그렇지 않은 경우로 나누어서 계산
+max[i]는 i번째 스티커에서의 최대값이라고 한다면 max[i] 는 i번째 스티커를 뜯지 않는 경우(max[i-1])와 i번째 스티커를 뜯는 경우(max[i-2]+sticker[i]) 중 더 큰값을 가지게 된다.
+*/
