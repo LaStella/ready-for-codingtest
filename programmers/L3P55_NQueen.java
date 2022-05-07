@@ -11,14 +11,14 @@ class Solution {
         // n개의 퀸이 n행에서 배치되는 열을 저장합니다. (ex. board[3] = 1 이라면, 3번 행퀸은 1열에 배치되었음을 의미합니다.)
         int[] board = new int[n];
         
-        
-        
+        dfs(0, n, board);
         
         return answer;
     }
     
     // k번째 행에 퀸을 배치하는 함수입니다.
     public void dfs(int k, int n, int[] board) {
+        // n개의 퀸을 모두 배치했다면 정답을 늘려줍니다.
         if(k == n) {
             answer++;
             return;
@@ -26,11 +26,19 @@ class Solution {
         else {
             // 0번째 열부터 n-1번째 열까지 확인합니다.
             for(int i = 0 ; i < n ; i++) {
+                boolean able = true;
                 // 각 열마다 이미 배치된 퀸들과 같은 열에 있는지, 대각선에 있는지 확인합니다.
                 for(int j = 0 ; j < k ; j++) {
                     if(board[j] == i || Math.abs(board[j]-i) == Math.abs(j-k)) {
+                        able = false;
                         break;
                     }
+                }
+                
+                // 이미 배치되어있는 퀸들(board)과 세로, 대각선으로 공격할 수 없다면 해당 열(i)에 퀸을 배치하고 다음 퀸을 배치합니다.
+                if(able) {
+                    board[k] = i;
+                    dfs(k+1, n, board);
                 }
             }
         }
