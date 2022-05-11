@@ -183,4 +183,4 @@
 - [level3] 하노이의 탑
 - [level3] N-Queen
 - [level3] 양과 늑대
-- [level3] 파괴되지 않은 건물 -미완
+- [level3] 파괴되지 않은 건물
