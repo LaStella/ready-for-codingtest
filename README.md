@@ -184,4 +184,4 @@
 - [level3] N-Queen
 - [level3] 양과 늑대
 - [level3] 파괴되지 않은 건물
-- [level3] 사라지는 발판 -미완
+- [level3] 사라지는 발판
