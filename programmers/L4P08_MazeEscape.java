@@ -42,7 +42,6 @@ class Solution {
             
             // 현재 정점이 도착 정점이라면 중단합니다.
             if(p_index == end) {
-                System.out.println(p_time);
                 break;
             }
             
@@ -51,7 +50,7 @@ class Solution {
             boolean trapActivated = false;
             if(trapMap.containsKey(p_index)) {
                 int trap_index = trapMap.get(p_index);
-                if(p_status.charAt(trap_index) != '0') {
+                if(p_status.charAt(trap_index) == '0') {
                     StringBuilder sb = new StringBuilder(p_status);
                     sb.setCharAt(trap_index, '1');
                     p_status = sb.toString();
@@ -69,6 +68,7 @@ class Solution {
             // 도착지가 트랩 정점이라면 트랩 발동 여부에 따라 통로의 사용을 결정합니다.
             for(int i = 1 ; i < n+1 ; i++) {
                 if(route[p_index][i] != 0) {
+                    // 도착지가 트랩 정점인 경우
                     if(trapMap.containsKey(i)) {
                         int i_trap_index = trapMap.get(i);
                         if((p_status.charAt(i_trap_index) == '0' && !trapActivated) || (p_status.charAt(i_trap_index) == '1' && trapActivated)) {
@@ -76,14 +76,63 @@ class Solution {
                                 dist[i] = p_time + route[p_index][i];
                                 q.add(new Node(i, dist[i], p_status));
                             }
+                            else {
+                                q.add(new Node(i, p_time + route[p_index][i], p_status));
+                            }
+                        }
+                    }
+                    // 도착지가 일반 정점인 경우
+                    else {
+                        if(trapActivated) {
+                            continue;
+                        }
+                        else {
+                            if(dist[i] > p_time + route[p_index][i]) {
+                                dist[i] = p_time + route[p_index][i];
+                                q.add(new Node(i, dist[i], p_status));
+                            }
+                            else {
+                                q.add(new Node(i, p_time + route[p_index][i], p_status));
+                            }
                         }
                     }
                 }
             }
             
+            // 역순 방향 통로
+            for(int i = 1 ; i < n+1 ; i++) {
+                if(reverse_route[p_index][i] != 0) {     
+                    if(trapMap.containsKey(i)) {
+                        int i_trap_index = trapMap.get(i);
+                        if((p_status.charAt(i_trap_index) == '0' && trapActivated) || (p_status.charAt(i_trap_index) == '1' && !trapActivated)) {
+                            if(dist[i] > p_time + reverse_route[p_index][i]) {
+                                dist[i] = p_time + reverse_route[p_index][i];
+                                q.add(new Node(i, dist[i], p_status));
+                            }
+                            else {
+                                q.add(new Node(i, p_time + reverse_route[p_index][i], p_status));
+                            }
+                        }
+                    }
+                    else {
+                        if(!trapActivated) {
+                            continue;
+                        }
+                        else {
+                            if(dist[i] > p_time + reverse_route[p_index][i]) {
+                                dist[i] = p_time + reverse_route[p_index][i];
+                                q.add(new Node(i, dist[i], p_status));
+                            }
+                            else {
+                                q.add(new Node(i, p_time + reverse_route[p_index][i], p_status));
+                            }
+                        }
+                    }
+                }
+            }
         }
         
-        
+        answer = dist[end];
         
         return answer;
     }
@@ -129,4 +178,8 @@ bfs를 이용하여 탐색
 > trap의 발동 여부를 항상 저장하여 다음 정점으로 정보를 넘겨줍니다.
     > ex. 입출력예2번에서 2번 트랩을 밟을 경우, 1번으로 이동하는 경우와 3번으로 이동하는 경우가 존재, 3번으로 이동할 경우 트랩이 발동하며, 1번으로 이동한 경우 트랩은 발동하지 않습니다. 서로 다른 경우이므로 트랩의 발동 유무는 공유하지 않아야합니다.
     > 트랩은 최대 10개 이므로 각 트랩에 순서대로 번호를 부여하여 0,1로 작동 여부를 저장합니다. (ex. trap이 10개, 1,2번 트랩 발동인 경우 trap_status = 1100000000)
+문제발생
+dist[i]는 출발지에서 i정점까지 최소 시간을 기록하는 배열
+허나 문제의 예2번에서 1>2>3>2로 순으로 진행될 경우, 마지막 2번 정점을 방문시 기존 2번 정점 방문시보다 시간이 더 크므로 넘어갈 수 없음.
+
 */
