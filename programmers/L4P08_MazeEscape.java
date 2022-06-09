@@ -1,6 +1,3 @@
-// 미로 탈출
-// https://programmers.co.kr/learn/courses/30/lessons/81304?language=java
-
 import java.util.*;
 
 class Solution {
@@ -8,10 +5,10 @@ class Solution {
         int answer = Integer.MAX_VALUE;
         
         // 출발지에서 각 정점으로 가는 최소 시간입니다. ex. dist[2] = start에서 2번 정점으로 가는 최소 시간
-        // HashMap<String, int[]> dist_map = new HashMap<>();
-        int[] dist = new int[n+1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        dist[start] = 0;
+        HashMap<String, int[]> dist_map = new HashMap<>();
+        int[] init_dist = new int[n+1];
+        Arrays.fill(init_dist, Integer.MAX_VALUE);
+        init_dist[start] = 0;
         
         int[][] route = new int[n+1][n+1];
         int[][] reverse_route = new int[n+1][n+1];
@@ -21,29 +18,25 @@ class Solution {
         for(int[] road : roads) {
             if(route[road[0]][road[1]] == 0) {
                 route[road[0]][road[1]] = road[2];
-            }
-            else {
-                route[road[0]][road[1]] = Math.min(route[road[0]][road[1]], road[2]);
-            }
-            if(reverse_route[road[1]][road[0]] == 0) {
                 reverse_route[road[1]][road[0]] = road[2];
             }
             else {
+                route[road[0]][road[1]] = Math.min(route[road[0]][road[1]], road[2]);
                 reverse_route[road[1]][road[0]] = Math.min(reverse_route[road[1]][road[0]], road[2]);
             }
         }
         
         // 트랩이 있는 정점을 저장합니다.
-        // 각 트랩마다 번호를 부여합니다. (ex. traps[2, 3] 인 경우 2,3번 정점에 각각 0,1번 트랩을 부여)
+        // 각 트랩마다 트랩을 나타내는 상태를 저장하게됩니다. (ex. 1번트랩 1, 2번트랩 10, 3번트랩 100...)
         HashMap<Integer, Integer> trapMap = new HashMap<>();
         for(int i = 0 ; i < traps.length ; i++) {
-            trapMap.put(traps[i], i);
+            trapMap.put(traps[i], 1<<(i));
         }
         
         // 다익스트라 알고리즘
         // 누적 시간이 적은 순으로 정렬하므로 우선순위큐를 사용합니다.
         Queue<Node> q = new PriorityQueue<>();
-        q.add(new Node(start, 0, "0".repeat(traps.length)));
+        q.add(new Node(start, 0, 0));
         
         while(!q.isEmpty()) {
             Node p_node = q.poll();
@@ -56,8 +49,7 @@ class Solution {
                 break;
             }
             
-            // 현재 정점이 트랩인지 아닌지 확인합니다.
-            // 트랩이라면 상태를 변경해줍니다.
+            // 현재 정점이 트랩이라면 트랩 발동 여부를 전환합니다. (기존 트랩 작동이라면 비작동으로, 비작동이라면 작동으로)
             boolean trapActivated = false;
             if(trapMap.containsKey(p_index)) {
                 int trap_index = trapMap.get(p_index);
@@ -83,14 +75,11 @@ class Solution {
                     if(trapMap.containsKey(i)) {
                         int i_trap_index = trapMap.get(i);
                         if((p_status.charAt(i_trap_index) == '0' && !trapActivated) || (p_status.charAt(i_trap_index) == '1' && trapActivated)) {
-                            // int[] dist = dist_map.getOrDefault(p_status, basic_dist.clone());
+                            int[] dist = dist_map.getOrDefault(p_status, init_dist.clone());
                             if(dist[i] > p_time + route[p_index][i]) {
                                 dist[i] = p_time + route[p_index][i];
-                                // dist_map.put(p_status, dist);
+                                dist_map.put(p_status, dist);
                                 q.add(new Node(i, dist[i], p_status));
-                            }
-                            else {
-                                q.add(new Node(i, p_time + route[p_index][i], p_status));
                             }
                         }
                     }
@@ -100,14 +89,11 @@ class Solution {
                             continue;
                         }
                         else {
-                            // int[] dist = dist_map.getOrDefault(p_status, basic_dist.clone());
+                            int[] dist = dist_map.getOrDefault(p_status, init_dist.clone());
                             if(dist[i] > p_time + route[p_index][i]) {
                                 dist[i] = p_time + route[p_index][i];
-                                // dist_map.put(p_status, dist);
+                                dist_map.put(p_status, dist);
                                 q.add(new Node(i, dist[i], p_status));
-                            }
-                            else {
-                                q.add(new Node(i, p_time + route[p_index][i], p_status));
                             }
                         }
                     }
@@ -120,14 +106,11 @@ class Solution {
                     if(trapMap.containsKey(i)) {
                         int i_trap_index = trapMap.get(i);
                         if((p_status.charAt(i_trap_index) == '0' && trapActivated) || (p_status.charAt(i_trap_index) == '1' && !trapActivated)) {
-                            // int[] dist = dist_map.getOrDefault(p_status, basic_dist.clone());
+                            int[] dist = dist_map.getOrDefault(p_status, init_dist.clone());
                             if(dist[i] > p_time + reverse_route[p_index][i]) {
                                 dist[i] = p_time + reverse_route[p_index][i];
-                                // dist_map.put(p_status, dist);
+                                dist_map.put(p_status, dist);
                                 q.add(new Node(i, dist[i], p_status));
-                            }
-                            else {
-                                q.add(new Node(i, p_time + reverse_route[p_index][i], p_status));
                             }
                         }
                     }
@@ -136,14 +119,11 @@ class Solution {
                             continue;
                         }
                         else {
-                            // int[] dist = dist_map.getOrDefault(p_status, basic_dist.clone());
+                            int[] dist = dist_map.getOrDefault(p_status, init_dist.clone());
                             if(dist[i] > p_time + reverse_route[p_index][i]) {
                                 dist[i] = p_time + reverse_route[p_index][i];
-                                // dist_map.put(p_status, dist);
+                                dist_map.put(p_status, dist);
                                 q.add(new Node(i, dist[i], p_status));
-                            }
-                            else {
-                                q.add(new Node(i, p_time + reverse_route[p_index][i], p_status));
                             }
                         }
                     }
@@ -151,10 +131,10 @@ class Solution {
             }
         }
         
-        answer = dist[end];
-        // for(String key : dist_map.keySet()) {
-        //     answer = Math.min(answer, dist_map.get(key)[end]);
-        // }
+        // answer = dist[end];
+        for(String key : dist_map.keySet()) {
+            answer = Math.min(answer, dist_map.get(key)[end]);
+        }
         
         
         return answer;
@@ -163,8 +143,8 @@ class Solution {
     class Node implements Comparable<Node> {
         int index;
         int time;
-        String status;
-        public Node(int index, int time, String status) {
+        int status;
+        public Node(int index, int time, int status) {
             this.index = index;
             this.time = time;
             this.status = status;
@@ -208,5 +188,9 @@ dist에 저장하지 않고 q에 정점을 넣는 것으로 해결, 하지만 �
 테스트케이스7 실패
 서로 다른 두 방 사이에 직접 연결된 길이 여러개 존재할 수도 있습니다. 라는 조건에서 방향만 다른길이 존재할 것으로생각하였으나, 같은 방향길도 여러개 존재할 수도 있으므로
 기존에 저장된 route라면 최소값이 저장되도록 변경하여 해결하였습니다.
+
+트랩상태를 string형태가 아닌 비트 연산을 이용하는것이 더 빠를것으로 생각됩니다.
+각 트랩을 순서대로 1의 쉬프트 연산을 이용하여 정수값을 저장합니다. (ex. 1 << n = 2의n제곱)
+현재 상태와 트랩의 번호에 따른 자리를 비트연산을 이용하여 발동여부를 확인합니다.
 
 */
