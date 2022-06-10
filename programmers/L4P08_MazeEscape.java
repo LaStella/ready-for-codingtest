@@ -1,3 +1,6 @@
+// 미로 탈출
+// https://programmers.co.kr/learn/courses/30/lessons/81304?language=java
+
 import java.util.*;
 
 class Solution {
@@ -5,10 +8,6 @@ class Solution {
         int answer = Integer.MAX_VALUE;
         
         // 출발지에서 각 정점으로 가는 최소 시간입니다. ex. dist[2] = start에서 2번 정점으로 가는 최소 시간
-        HashMap<String, int[]> dist_map = new HashMap<>();
-        int[] init_dist = new int[n+1];
-        Arrays.fill(init_dist, Integer.MAX_VALUE);
-        init_dist[start] = 0;
         
         int[][] route = new int[n+1][n+1];
         int[][] reverse_route = new int[n+1][n+1];
@@ -20,6 +19,7 @@ class Solution {
                 route[road[0]][road[1]] = road[2];
                 reverse_route[road[1]][road[0]] = road[2];
             }
+            // 이미 통로가 존재하는 경우, 더 적은 시간이 소모되는 통로를 저장합니다.
             else {
                 route[road[0]][road[1]] = Math.min(route[road[0]][road[1]], road[2]);
                 reverse_route[road[1]][road[0]] = Math.min(reverse_route[road[1]][road[0]], road[2]);
@@ -33,6 +33,11 @@ class Solution {
             trapMap.put(traps[i], 1<<(i));
         }
         
+        int[][] dist = new int[n+1][1<<trapMap.size()+1];
+        for(int i = 0 ; i < n+1 ; i++) {
+            Arrays.fill(dist[i], Integer.MAX_VALUE);
+        }
+        
         // 다익스트라 알고리즘
         // 누적 시간이 적은 순으로 정렬하므로 우선순위큐를 사용합니다.
         Queue<Node> q = new PriorityQueue<>();
@@ -42,27 +47,21 @@ class Solution {
             Node p_node = q.poll();
             int p_index = p_node.index;
             int p_time = p_node.time;
-            String p_status = p_node.status;
+            int p_status = p_node.status;
             
             // 현재 정점이 도착 정점이라면 중단합니다.
             if(p_index == end) {
                 break;
             }
             
+            // 현재 트랩 발동 상태를 나타내는 변수입니다. (0 = off, 1 = on)
+            int current_trap = 0;
             // 현재 정점이 트랩이라면 트랩 발동 여부를 전환합니다. (기존 트랩 작동이라면 비작동으로, 비작동이라면 작동으로)
-            boolean trapActivated = false;
             if(trapMap.containsKey(p_index)) {
-                int trap_index = trapMap.get(p_index);
-                if(p_status.charAt(trap_index) == '0') {
-                    StringBuilder sb = new StringBuilder(p_status);
-                    sb.setCharAt(trap_index, '1');
-                    p_status = sb.toString();
-                    trapActivated = true;
-                }
-                else {
-                    StringBuilder sb = new StringBuilder(p_status);
-                    sb.setCharAt(trap_index, '0');
-                    p_status = sb.toString();
+                p_status ^= trapMap.get(p_index);
+                // 현재 상태에서 현재 트랩의 발동 여부를 확인합니다. (ex. status = 10110, trap = 10일 경우 &연산시 00010으로 트랩 발동)
+                if((p_status & trapMap.get(p_index)) != 0) {
+                    current_trap = 1;
                 }
             }
             
@@ -71,30 +70,20 @@ class Solution {
             // 도착지가 트랩 정점이라면 트랩 발동 여부에 따라 통로의 사용을 결정합니다.
             for(int i = 1 ; i < n+1 ; i++) {
                 if(route[p_index][i] != 0) {
-                    // 도착지가 트랩 정점인 경우
+                    int next_trap = 0;
+                    // 도착지가 트랩 정점이라면 트랩이 발동 중인지 확인합니다.
                     if(trapMap.containsKey(i)) {
-                        int i_trap_index = trapMap.get(i);
-                        if((p_status.charAt(i_trap_index) == '0' && !trapActivated) || (p_status.charAt(i_trap_index) == '1' && trapActivated)) {
-                            int[] dist = dist_map.getOrDefault(p_status, init_dist.clone());
-                            if(dist[i] > p_time + route[p_index][i]) {
-                                dist[i] = p_time + route[p_index][i];
-                                dist_map.put(p_status, dist);
-                                q.add(new Node(i, dist[i], p_status));
-                            }
+                        if((p_status & trapMap.get(i)) != 0) {
+                            next_trap = 1;
                         }
                     }
-                    // 도착지가 일반 정점인 경우
-                    else {
-                        if(trapActivated) {
-                            continue;
-                        }
-                        else {
-                            int[] dist = dist_map.getOrDefault(p_status, init_dist.clone());
-                            if(dist[i] > p_time + route[p_index][i]) {
-                                dist[i] = p_time + route[p_index][i];
-                                dist_map.put(p_status, dist);
-                                q.add(new Node(i, dist[i], p_status));
-                            }
+                    
+                    // 현재 트랩과 도착지 트랩의 xor연산 결과가 0이라면 정순 방향 통로를 이용할 수 있습니다.
+                    // 현재 트랩과 도착지 트랩이 모두 발동이라면 통로의 방향이 2번 바뀌므로 정순 통로 방향이 됩니다.
+                    if((current_trap ^ next_trap) == 0) {
+                        if(dist[i][p_status] > p_time + route[p_index][i]) {
+                            dist[i][p_status] = p_time + route[p_index][i];
+                            q.add(new Node(i, dist[i][p_status], p_status));
                         }
                     }
                 }
@@ -102,40 +91,31 @@ class Solution {
             
             // 역순 방향 통로
             for(int i = 1 ; i < n+1 ; i++) {
-                if(reverse_route[p_index][i] != 0) {     
+                if(reverse_route[p_index][i] != 0) {
+                    int next_trap = 0;
+                    // 도착지가 트랩 정점이라면 트랩이 발동 중인지 확인합니다.
                     if(trapMap.containsKey(i)) {
-                        int i_trap_index = trapMap.get(i);
-                        if((p_status.charAt(i_trap_index) == '0' && trapActivated) || (p_status.charAt(i_trap_index) == '1' && !trapActivated)) {
-                            int[] dist = dist_map.getOrDefault(p_status, init_dist.clone());
-                            if(dist[i] > p_time + reverse_route[p_index][i]) {
-                                dist[i] = p_time + reverse_route[p_index][i];
-                                dist_map.put(p_status, dist);
-                                q.add(new Node(i, dist[i], p_status));
-                            }
+                        if((p_status & trapMap.get(i)) != 0) {
+                            next_trap = 1;
                         }
                     }
-                    else {
-                        if(!trapActivated) {
-                            continue;
-                        }
-                        else {
-                            int[] dist = dist_map.getOrDefault(p_status, init_dist.clone());
-                            if(dist[i] > p_time + reverse_route[p_index][i]) {
-                                dist[i] = p_time + reverse_route[p_index][i];
-                                dist_map.put(p_status, dist);
-                                q.add(new Node(i, dist[i], p_status));
-                            }
+                    
+                    // 현재 트랩과 도착지 트랩의 xor연산 결과가 1이라면 역순 방향 통로를 이용할 수 있습니다.
+                    // 현재 트랩과 도착지 트랩 중 하나만 발동 중이라면 통로의 방향은 역순이 됩니다.
+                    if((current_trap ^ next_trap) == 1) {
+                        if(dist[i][p_status] > p_time + reverse_route[p_index][i]) {
+                            dist[i][p_status] = p_time + reverse_route[p_index][i];
+                            q.add(new Node(i, dist[i][p_status], p_status));
                         }
                     }
                 }
             }
         }
         
-        // answer = dist[end];
-        for(String key : dist_map.keySet()) {
-            answer = Math.min(answer, dist_map.get(key)[end]);
+        // 모든 end정점(방)에서의 값을 비교해 최소값을 찾습니다.
+        for(int d : dist[end]) {
+            answer = Math.min(answer, d);
         }
-        
         
         return answer;
     }
@@ -192,5 +172,8 @@ dist에 저장하지 않고 q에 정점을 넣는 것으로 해결, 하지만 �
 트랩상태를 string형태가 아닌 비트 연산을 이용하는것이 더 빠를것으로 생각됩니다.
 각 트랩을 순서대로 1의 쉬프트 연산을 이용하여 정수값을 저장합니다. (ex. 1 << n = 2의n제곱)
 현재 상태와 트랩의 번호에 따른 자리를 비트연산을 이용하여 발동여부를 확인합니다.
+
+map을 이용하여 상태에 따른 dist배열을 저장하였으나 테스트 케이스 5번을 통과하지 못하는 문제가 계속 발생하였습니다.
+이를 2차 배열로 변경하니 해결되었습니다.
 
 */
