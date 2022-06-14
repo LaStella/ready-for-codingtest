@@ -17,8 +17,7 @@ class Solution {
             c_count = 0;
             
             Deque<Integer> y = new ArrayDeque<>();
-            List<Integer> c = new ArrayList<>();
-            dfs(0, b, y, c);
+            dfs(0, b, y);
             
             answer[i] = c_count;
         }
@@ -26,7 +25,7 @@ class Solution {
         return answer;
     }
     
-    public void dfs(int depth, int[] b, Deque<Integer> y, List<Integer> c) {
+    public void dfs(int depth, int[] b, Deque<Integer> y) {
         // 깊이(i)가 b의 길이(n)라면 종료합니다.
         if(depth == b.length) {
             c_count++;
@@ -35,17 +34,15 @@ class Solution {
         Deque<Integer> n_y = new ArrayDeque<>(y);
         // 합성하지 않고 다음 세포로 넘어갑니다.
         n_y.add(b[depth]);
-        dfs(depth+1, b, n_y, c);
+        dfs(depth+1, b, n_y);
         
         // Y가 현재 세포와 같은 크기의 숫자라면 합성할 수 있습니다.
         if(!y.isEmpty() && y.peekLast() == b[depth]) {
             n_y = new ArrayDeque<>(y);
-            List<Integer> n_c = new ArrayList<>(c);
             int[] n_b = b.clone();
             n_y.pollLast();
             n_b[depth] *= 2;
-            n_c.add(depth);
-            dfs(depth, n_b, n_y, n_c);
+            dfs(depth, n_b, n_y);
         }
     }
 }
@@ -67,4 +64,10 @@ set에 저장된 c들은 중복이 제거되므로 set의 크기가 곧 답이�
 문제발생> Y세포를 합치는 경우와 합치지 않는 경우 두 경우 모두 dfs로 계산하는데 빈 스택에 접근하는 오류가 발생합니다.
 Stack을 dfs에서 사용하게 될 경우 같은 주소값을 사용하여서 빈 스택에서 값을 뽑는 오류가 발생한다고 생각됩니다.
 위와같은 문제가 배열b에서도 동일하게 발생하여 dfs에 사용하는 각 자료형을 새로 생성하여 해결하였습니다.
+시간초과
+-------------------------------------------------------
+시간이 너무 오래 걸리므로 dp을 활용해야 하는 것으로 보입니다.
+우선 각 세포들은 모두 양수이며 배열c는 중복되는 배열이 나올 수 없습니다.
+점화식이 도저히 떠오르지 않아 포기하였습니다.
+
 */
