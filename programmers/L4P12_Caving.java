@@ -21,8 +21,10 @@ class Solution {
             order_map.put(o[1], o[0]);
         }
         
+        // 큐에는 현재 방문 가능한 방 번호가 들어갑니다.
         Queue<Integer> q = new LinkedList<>();
         q.add(0);
+        // 큐에 있는 방을 순회한 횟수를 저장합니다.
         int count = 0;
         
         while(!q.isEmpty()) {
@@ -40,9 +42,12 @@ class Solution {
                     continue;
                 }
             }
+            
+            // 입장 순서가 없거나, 입장 순서를 충족시키는 방이라면 방문처리를 하고 순회 횟수를 초기화합니다.
             count = 0;
             visited[p_index] = true;
             
+            // 현재 방과 연결된 다른 방들을 큐에 넣습니다.
             for(int i = 0 ; i < n ; i++) {
                 // 방문하지 않은 방이며 통로가 존재하는 방인지 확인합니다.
                 if(!visited[i] && route[p_index][i]) {
