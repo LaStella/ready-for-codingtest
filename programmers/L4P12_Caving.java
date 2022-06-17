@@ -19,37 +19,30 @@ class Solution {
             route.get(p[1]).add(p[0]);
         }
         
-        // 모든 순서를 맵으로 저장합니다. (key : 방 번호, value : key를 들어가기 위해 먼저 방문해야하는 방번호)
-        HashMap<Integer, Integer> order_map = new HashMap<>();
+        // 각 방의 선행방을 저장합니다.
+        // 선행방이 존재하지 않는 경우 0이 저장됩니다.
+        int[] before_room = new int[n];
         for(int[] o : order) {
-            order_map.put(o[1], o[0]);
+            before_room[o[1]] = o[0];
         }
+        
+        // 각 방의 후행방을 저장할 배열입니다. (하나의 방에 대해서 2개 이상 선행방이 존재할 수 없으므로, 1차배열로 저장이 가능합니다.)
+        int[] after_room = new int[n];
         
         // 큐에는 현재 방문 가능한 방 번호가 들어갑니다.
         Queue<Integer> q = new LinkedList<>();
         visited[0] = true;
         q.add(0);
-        // 큐에 있는 방을 순회한 횟수를 저장합니다.
-        int count = 0;
         
         while(!q.isEmpty()) {
-            // count가 큐의 크기와 같다면 한바퀴를 순회하였으므로 탐험이 불가능한 상태입니다.
-            if(count == q.size()) {
-                return false;
-            }
             int p_index = q.poll();
-            
-            // 입장 순서가 존재하는 방인지 확인합니다.
-            if(order_map.containsKey(p_index)) {
-                if(!visited[order_map.get(p_index)]) {
-                    q.add(p_index);
-                    count++;
-                    continue;
-                }
+            // 선행방을 방문하였는지 확인합니다.
+            if(!visited[before_room[p_index]]) {
+                after_room[before_room[p_index]] = p_index;
+                continue;
             }
             
             // 입장 순서가 없거나, 입장 순서를 충족시키는 방이라면 방문처리를 하고 순회 횟수를 초기화합니다.
-            count = 0;
             visited[p_index] = true;
             
             // 현재 방과 연결된 다른 방들을 큐에 넣습니다.
@@ -58,6 +51,18 @@ class Solution {
                 if(!visited[i]) {
                     q.add(i);
                 }
+            }
+            
+            // 후행방이 존재하는 경우 후행 방 또한 큐에 넣습니다.
+            if(after_room[p_index] != 0) {
+                q.add(after_room[p_index]);
+            }
+        }
+        
+        // 방문하지 않은 방이 있는지 확인합니다.
+        for(boolean v : visited) {
+            if(!v) {
+                return false;
             }
         }
         
@@ -76,6 +81,7 @@ order를 map에 저장합니다.
 
 문제발생> 방과 방 사이의 통로들을 2차 boolean배열 형태로 저장하였으나, n의 크기가 커짐에 따라 메모리가 초과되는 문제가 발생하였습니다.
 이를 해결하기 위해 각 통로들을 ArrayList를 이용하여 저장하였습니다.
-문제발생> 마지막 효율성 테스트에서 시간초과가 발생하였습니다. 입장 순서가 존재하는 방인 경우 먼저 방문해야 하는 방을 방문하지 않은 경우 다시 큐에 넣게되는데,
-이때 먼저 방문해야 하는 방을 방문하여도 큐에서 해당 방의 차례가 오기까지 한참 걸릴 수 있는 문제가 있습니다.
+문제발생> 마지막 효율성 테스트에서 시간초과가 발생하였습니다. 입장 순서가 존재하는 방인 경우 선행방을 방문하지 않은 경우 다시 큐에 넣게되는데,
+이때 선행방을 방문하여도 큐에서 해당 방의 차례가 오기까지 한참 걸릴 수 있는 문제가 있습니다.
+후행방을 따로 저장하는 배열을 만들어 선행방을 방문하지 않은 경우 큐에 도로 넣지 않고, 후행방[선행방]에 현재 방을 넣어 해결하였습니다.
 */
