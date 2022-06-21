@@ -7,84 +7,41 @@ class Solution {
     public int[] solution(int m, int n, int s, int[][] time_map) {
         int[] answer = new int[2];
         
-        // 각 칸의 모든 이동 횟수를 임의의 큰 숫자로 초기화합니다.
-        int[][][] board = new int[m][n][2];
+        // 각 칸의 모든 이동 횟수를 2500으로 초기화합니다.
+        int mn = m*n;
+        int[][][] board = new int[m][n][mn];
         for(int r = 0 ; r < m ; r++) {
             for(int c = 0 ; c < n ; c++) {
-                board[r][c][0] = Integer.MAX_VALUE;
-                board[r][c][1] = Integer.MAX_VALUE;
+                Arrays.fill(board[r][c], Integer.MAX_VALUE);
             }
         }
         
-        Queue<Node> q = new PriorityQueue<>();
-        q.add(new Node(0, 0, 0, 0));
+        board[0][0][0] = 0;
         int[] dr = {-1, 1, 0, 0};
         int[] dc = {0, 0, -1, 1};
         
-        while(!q.isEmpty()) {
-            // 큐에서 가장 적은 이동 횟수를 가진 노드를 뽑습니다.
-            // 같은 이동 횟수라면 더 적은 대화시간을 가지는 노드를 뽑습니다.
-            Node p_node = q.poll();
-            int r = p_node.r;
-            int c = p_node.c;
-            
-            // 도착지에 도착하면 중단합니다.
-            if(r == m-1 && c == n-1) {
-                answer[0] = p_node.moveDistance;
-                answer[1] = p_node.sumOfTalkTime;
-                break;
-            }
-            // 현재 좌표에 도착했을 때의 이동 횟수가 기존것보다 많으면 넘어갑니다.
-            if(board[r][c][0] < p_node.moveDistance && board[r][c][1] < p_node.sumOfTalkTime) {
-                continue;
-            }
-            
-            // 현재 좌표의 이동 횟수와 대화 시간을 각각 더 작은 값으로 저장합니다.
-            board[r][c][0] = Math.min(board[r][c][0], p_node.moveDistance);
-            board[r][c][1] = Math.min(board[r][c][1], p_node.sumOfTalkTime);
-            
-            // 현재 좌표를 기준으로 상, 하, 좌, 우로 움직인 새로운 좌표를 만들어 탐색합니다.
-            for(int i = 0 ; i < 4 ; i++) {
-                int nr = r+dr[i];
-                int nc = c+dc[i];
-                // 좌표가 파티장을 벗어나면 넘어갑니다.
-                if(!inRange(nr, nc, m, n)) continue;
-                
-                // 새로운 좌표가 테이블이 위치하거나 튜브가 미친오리로 변하는 좌표라면 탐색할 수 없습니다.
-                if(time_map[nr][nc] != -1 && p_node.sumOfTalkTime + time_map[nr][nc] <= s) {
-                    q.add(new Node(nr, nc, p_node.moveDistance+1, p_node.sumOfTalkTime+time_map[nr][nc]));
+        for(int d = 0 ; d < mn ; d++) {
+            for(int r = 0 ; r < m ; r++) {
+                for(int c = 0 ; c < n ; c++) {
+                    for(int i = 0 ; i < 4 ; i++) {
+                        int nr = r+dr[i];
+                        int nc = c+dc[i];
+                        // 범위를 벗어나는 좌표나 테이블인 좌표는 넘어갑니다.
+                        if(!inRange(nr, nc, m, n) || time_map[nr][nc] == -1) continue;
+                        board[nr][nc][d+1] = Math.min(board[nr][nc][d+1], board[r][c][d] + time_map[nr][nc])
+                    }
                 }
             }
         }
+        
+        
+        
       
         return answer;
     }
     
     public boolean inRange(int r, int c, int m, int n) {
         return 0 <= r && r < m && 0 <= c && c < n;
-    }
-}
-
-class Node implements Comparable<Node> {
-    int r;
-    int c;
-    int moveDistance;
-    int sumOfTalkTime;
-    Node(int r, int c, int m, int s) {
-        this.r = r;
-        this.c = c;
-        this.moveDistance = m;
-        this.sumOfTalkTime = s;
-    }
-    
-    @Override
-    public int compareTo(Node other) {
-        if(this.moveDistance == other.moveDistance) {
-            return this.sumOfTalkTime - other.sumOfTalkTime;
-        }
-        else {
-            return this.moveDistance - other.moveDistance;
-        }
     }
 }
 
@@ -101,6 +58,12 @@ class Node implements Comparable<Node> {
 노드를 우선순위큐를 이용하여 정렬하며, 정렬 조건의 최우선은 이동횟수, 이동횟수가 같다면 대화시간을 비교하여 정렬하도록 하였습니다.
 
 문제발생> 테스트케이스 시간초과
+
+
+시간이 너무 오래걸리는 문제로 dp로 접근하였습니다.
+board[r][c][d] = t,  d = 이동횟수 t = 대화시간
+board[0][0][0] = 0으로 시작
+board[1][0][1], board[0][1][1] 에 대화시간의 최소값을 저장 Math.min(board[1][0][1], board[0][0][0] + time_map[1][0])
 
 
 */
