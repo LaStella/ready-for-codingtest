@@ -7,9 +7,10 @@ class Solution {
     public int[] solution(int m, int n, int s, int[][] time_map) {
         int[] answer = new int[2];
         
-        // 각 칸의 모든 이동 횟수를 2500으로 초기화합니다.
-        int mn = m*n;
-        int[][][] board = new int[m][n][mn];
+        
+        int mn = m*n+1;
+        // 각 칸의 모든 대화 시간을 최대치로 초기화합니다.
+        long[][][] board = new long[m][n][mn];
         for(int r = 0 ; r < m ; r++) {
             for(int c = 0 ; c < n ; c++) {
                 Arrays.fill(board[r][c], Integer.MAX_VALUE);
@@ -20,21 +21,34 @@ class Solution {
         int[] dr = {-1, 1, 0, 0};
         int[] dc = {0, 0, -1, 1};
         
-        for(int d = 0 ; d < mn ; d++) {
+        for(int d = 0 ; d < mn-1 ; d++) {
             for(int r = 0 ; r < m ; r++) {
                 for(int c = 0 ; c < n ; c++) {
+                    // 테이블이 있는 곳에서 이동할 수 없으므로 넘어갑니다.
+                    if(time_map[r][c] == -1) continue;
                     for(int i = 0 ; i < 4 ; i++) {
                         int nr = r+dr[i];
                         int nc = c+dc[i];
                         // 범위를 벗어나는 좌표나 테이블인 좌표는 넘어갑니다.
                         if(!inRange(nr, nc, m, n) || time_map[nr][nc] == -1) continue;
-                        board[nr][nc][d+1] = Math.min(board[nr][nc][d+1], board[r][c][d] + time_map[nr][nc])
+                        // 대화 시간의 합이 s를 초과하는지 확인합니다.
+                        if(board[r][c][d] + time_map[nr][nc] <= s) {
+                            // 같은 이동 횟수라면 더 적은 대화시간을 가지는 값을 저장합니다.
+                            board[nr][nc][d+1] = Math.min(board[nr][nc][d+1], board[r][c][d] + time_map[nr][nc]);    
+                        }
                     }
                 }
             }
         }
         
-        
+        // 이동 횟수가 적은 것부터 대화 시간이 초기값이 아닌 값을 찾습니다.
+        for(int d = 0 ; d < mn-1 ; d++) {
+            if(board[m-1][n-1][d] != Integer.MAX_VALUE) {
+                answer[0] = d;
+                answer[1] = (int)board[m-1][n-1][d];
+                break;
+            }
+        }
         
       
         return answer;
@@ -64,6 +78,6 @@ class Solution {
 board[r][c][d] = t,  d = 이동횟수 t = 대화시간
 board[0][0][0] = 0으로 시작
 board[1][0][1], board[0][1][1] 에 대화시간의 최소값을 저장 Math.min(board[1][0][1], board[0][0][0] + time_map[1][0])
-
-
+board[r][c][d] + time_map[nr][nc] <= s, 대화 시간의 합은 최소시간 s보다 작아야합니다.
+board[nr][nc][d+1] = Math.min(board[nr][nc][d+1], board[r][c][d] + time_map[nr][nc]), 더 적은 대화시간을 저장합니다.
 */
