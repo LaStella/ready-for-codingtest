@@ -39,6 +39,14 @@ class Solution {
                 count++;
             }
         }
+        
+        // for(int i = 1 ; i < n+1 ; i++) {
+        //     if(dist[b] == dist[i]) {
+        //         count++;
+        //     }
+        // }
+        
+        
         // 가장 먼 정점이 2개 이상이라면 두 정점이 b, c가 됩니다.
         // 따라서 중간값은 a에서 b또는 c까지의 거리가 됩니다. (a~b, b~c, c~a에서 a~b와 a~c는 거리가 같으므로 중간값이 됩니다.)
         if(count >= 2) return dist[b];
@@ -49,7 +57,7 @@ class Solution {
         count = 1;
         for(int i = 1 ; i < n+1 ; i++) {
             if(dist[c] < dist[i]) {
-                b = i;
+                c = i;
                 count = 1;
             }
             else if(dist[c] == dist[i]) {
@@ -64,7 +72,7 @@ class Solution {
         // 1~5번 정점까지의 거리는 4이며 1~5번 사이의 정점을 c로 골라야 하며 중간값이 가장 크게 고른다면 2번 또는 4번 정점을 고르게됩니다.
         // 1~2의 거리는 1, 2~5의 거리는 3, 또는 1~4의 거리는 3, 4~5의 거리는 1
         // 1~3, 3~5의 거리는 2가 되므로 중간값이 2가 되어 위의 두 경우보다 작습니다.
-        answer = dist[b]-1;
+        answer = dist[c]-1;
         
         return answer;
     }
