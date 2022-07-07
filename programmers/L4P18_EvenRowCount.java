@@ -5,10 +5,31 @@ class Solution {
     public int solution(int[][] a) {
         int answer = -1;
         
-        int n = a.length;
-        int m = a[0].length;
+        int row = a.length;
+        int col = a[0].length;
+        double mod = 1e7+19;
         
+        double[][] combis = new double[row+1][row+1];
+        // System.out.println(combis[0][0]);
+        combis[0][0] = 1;
+        // nCr을 모두 구합니다.
+        for(int n = 1 ; n <= row ; n++) {
+            for(int r = 0 ; r <= n ; r++) {
+                if(r == 0) combis[n][r] = 1;
+                else if (r == n) combis[n][r] = 1;
+                else combis[n][r] = (combis[n-1][r-1] + combis[n-1][r]) % mod;
+            }
+        }
         
+        int[] numOfOne = new int[col];
+        
+        for(int c = 0 ; c < col ; c++) {
+            for(int r = 0 ; r < row ; r++) {
+                if(a[r][c] == 1) numOfOne[c]++;
+            }
+        }
+        
+        // System.out.println(1e7+19);
         
         return answer;
     }
