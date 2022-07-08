@@ -31,6 +31,28 @@ class Solution {
         
         // System.out.println(1e7+19);
         
+        // dp[i][j] : 첫 번째 열부터 i번째 열까지 j개의 짝수행을 가진 배열의 경우의 수
+        double[][] dp = new double[col+1][row+1];
+        
+        dp[1][row-numOfOne[0]] = combis[row][row-numOfOne[0]];
+        
+        for(int c = 1 ; c <= col ; c++) {
+            for(int r = 0 ; r <= row ; r++) {
+                if(dp[c][r] == 0) continue;
+                
+                for(int k = 0 ; k <= numOfOne[c] ; k++) {
+                    int next = (c - k) + (numOfOne[c] - k);
+                    
+                    if(next > row || c < k) continue;
+                    
+                    double cases = (combis[r][k] * combis[row-r][numOfOne[c] - k]) % mod;
+                    
+                    dp[c+1][next] += (dp[c][r] * cases) % mod;
+                }
+            }
+        }
+        
+        System.out.println(dp[col][row]);
         return answer;
     }
 }
