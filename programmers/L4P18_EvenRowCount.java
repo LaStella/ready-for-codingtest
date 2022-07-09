@@ -23,8 +23,14 @@ class Solution {
         
         int[] numOfOne = new int[col];
         
-        for(int c = 0 ; c < col ; c++) {
-            for(int r = 0 ; r < row ; r++) {
+        // for(int c = 0 ; c < col ; c++) {
+        //     for(int r = 0 ; r < row ; r++) {
+        //         if(a[r][c] == 1) numOfOne[c]++;
+        //     }
+        // }
+        
+        for(int r = 0 ; r < row ; r++) {
+            for(int c = 0 ; c < col ; c++) {
                 if(a[r][c] == 1) numOfOne[c]++;
             }
         }
@@ -41,13 +47,15 @@ class Solution {
                 if(dp[c][r] == 0) continue;
                 
                 for(int k = 0 ; k <= numOfOne[c] ; k++) {
-                    int next = (c - k) + (numOfOne[c] - k);
+                    int next = (r - k) + (numOfOne[c] - k);
                     
-                    if(next > row || c < k) continue;
+                    if(next > row || r < k) continue;
                     
                     double cases = (combis[r][k] * combis[row-r][numOfOne[c] - k]) % mod;
                     
                     dp[c+1][next] += (dp[c][r] * cases) % mod;
+                    // dp[c][r] = 0;
+                    // dp[c+1][next] = 0;
                 }
             }
         }
@@ -67,5 +75,5 @@ dp로 접근
 너무 어려워서 풀이글을 보았습니다.
 풀이글을 이해를 못하여 현재 이해하려고 보는 중
 
-
+이해가 안되서 일단 포기합니다.
 */
