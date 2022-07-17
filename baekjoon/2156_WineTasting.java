@@ -18,7 +18,7 @@ public class Main {
         }
 
         // dp[i][0] : i번째 포도주에서 가장 많이 마신 양
-        int[] dp = new int[n+1];
+        int[] dp = new int[n+2];
         dp[1] = wine[1];
         dp[2] = wine[1]+wine[2];
         for(int i = 3 ; i < n+1 ; i++) {
