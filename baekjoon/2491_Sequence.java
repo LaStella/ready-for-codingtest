@@ -29,18 +29,21 @@ public class Main {
             Arrays.fill(dp[i], 1);
         }
 
-        int max = 0;
+        // 수열의 길이는 최소 1이므로 최대 길이를 1로 초기화합니다.
+        int max = 1;
 
         for (int i = 1 ; i < n ; i++) {
+            // 커지는 수열이라면 i-1번까지 커지는 수열의 길이에 1을 더한 길이가 i번 수열에서 커지는 수열의 길이입니다.
             if(s[i] >= s[i-1]) {
                 dp[i][0] = dp[i-1][0]+1;
+                max = Math.max(max, dp[i][0]);
             }
 
+            // 작아지는 수열 또한 위와 마찬가지로 계산합니다.
             if(s[i] <= s[i-1]) {
                 dp[i][1] = dp[i-1][1]+1;
+                max = Math.max(max, dp[i][1]);
             }
-
-            max = Math.max(max, Math.max(dp[i][0], dp[i][1]));
         }
 
         System.out.println(max);
