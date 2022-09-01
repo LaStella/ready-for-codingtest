@@ -22,11 +22,9 @@ public class Main {
             inst[i] = Integer.parseInt(st.nextToken());
         }
 
+        // dp[i][j][k] : 왼발이 j, 오른발이 k에 있을 때 남은 지시 사항(i ~ n)을 만족하는데 필요한 최소의 힘
         dp = new int[n+1][5][5];
-//
-//        for (int i = 1 ; i < n; i++) {
-//            System.out.println(inst[i]);
-//        }
+
         System.out.println(dfs(1, 0, 0));
     }
 
@@ -36,7 +34,7 @@ public class Main {
         if(index == n) return 0;
 
         // dp에는 최소 힘이 저장되므로 이미 구한 경우 중복계산할 필요가 없습니다.
-        if(dp[index][left][right] == 0) {
+        if(dp[index][left][right] == -1) {
             // 왼발이 움직이는 경우 필요한 힘은 다음 지시에서 이동한 왼발과 이동하지않은 오른발의 위치에 따른 최소힘과 왼발이 현재 지시에 따라 이동하는데 들어가는 힘의 합입니다.
             int left_move = dfs(index+1, inst[index], right) + getPower(left, inst[index]);
             // 오른발이 움직이는 경우이며 계산 방법은 위와 같습니다.
@@ -51,9 +49,16 @@ public class Main {
 
     // start지점에서 end지점으로 이동하는데 필요한 힘을 리턴하는 함수입니다.
     public static int getPower(int start, int end) {
-        int d = Math.abs(start-end);
+        // 출발 지점이 0이라면 어느 지점으로 이동하든 2의 힘이 필요합니다.
         if (start == 0) return 2;
+
+        // 두 지점(start, end)의 절대값 차이
+        int d = Math.abs(start-end);
+        // 같은 지점으로의 이동은 1의 힘이 필요합니다.
+        if (d == 0) return 1;
+        // 출발 지점의 인접한 지점으로 이동은 3의 힘이 필요합니다.
         if (d == 1 || d == 3) return 3;
+        // 출발 지점과 반대 지점으로 이동은 4의 힘이 필요합니다.
         return 4;
     }
 }
