@@ -7,26 +7,74 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
+    static int N, W;
+    static int[][] e;
+    static int[] inside, outside, bothside;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int T = Integer.parseInt(br.readLine());
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        while(T-- > 0) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
 
-        int N = Integer.parseInt(st.nextToken());
-        int W = Integer.parseInt(st.nextToken());
+            N = Integer.parseInt(st.nextToken());
+            W = Integer.parseInt(st.nextToken());
 
-        int[][] e = new int[2][N];
+            e = new int[2][N];
 
-        for (int i = 0 ; i <= 1 ; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0 ; j < N ; j++)
-            e[i][j] = Integer.parseInt(st.nextToken());
+            for (int i = 0 ; i <= 1 ; i++) {
+                st = new StringTokenizer(br.readLine());
+                for (int j = 0 ; j < N ; j++)
+                    e[i][j] = Integer.parseInt(st.nextToken());
+            }
+
+            inside = new int[N];
+            outside = new int[N];
+            bothside = new int[N];
+            int answer = Integer.MAX_VALUE;
+
+            inside[0] = 1;
+            outside[0] = 1;
+            bothside[0] = e[0][0]+e[1][0] < W ? 1 : 2;
+            solve();
+
+            answer = Math.min(answer, bothside[N-1]);
+
+            System.out.println(answer);
         }
 
 
 
+
+    }
+
+    public static void solve() {
+        for (int i = 1 ; i < N ; i++) {
+            // i번 안쪽 구역까지 침투시키는 최소 개수
+            inside[i] = bothside[i-1]+1;
+
+            // i번 안쪽 구역의 붙어있는 두 구역의 적들이 W보다 작다면 한번의 침투로 가능합니다. (인접한 구역으로 한번 더 침투가 가능하므로)
+            if (e[0][i]+e[0][i-1] < W) {
+                inside[i] = Math.min(inside[i], outside[i-1]+1);
+            }
+
+            // i번 바깥쪽 구역까지 침투시키는 최소 개수
+            outside[i] = bothside[i-1]+1;
+
+            // 위와 마찬가지로 인접한 두 구역 적들이 W보다 작아 한번의 침투로 가능합니다.
+            if (e[1][i]+e[1][i-1] < W) {
+                outside[i] = Math.min(outside[i], inside[i-1]+1);
+            }
+
+            // i번 안쪽과 바깥쪽까지 모두 침투시키는 최소 개수
+            bothside[i] = Math.min(inside[i]+1, outside[i]+1);
+
+            // i번 구역의 안쪽과 바깥쪽 적들이 W보다 작다면 한번의 침투로 가능합니다.
+            if (e[0][i]+e[1][i] < W) {
+                bothside[i] = Math.min(bothside[i], bothside[i-1]+1);
+            }
+        }
     }
 }
 
@@ -71,9 +119,9 @@ bothside[i] : i번째 열을 점령하는데 드는 최소 특수소대의 수
     0번째 열의 바깥쪽을 침투하는 경우는 1가지입니다.
     outside[0] = 1
     0번째 열 전체를 침투하는 방법은 안쪽과 바깥쪽 두 번을 침투하는 경우와 안쪽과 바깥쪽의 적의 수가 W보다 작아 한번의 침투로 가능한 경우가 있습니다.
-    bothside[0] = if(e[0][0]+e[0][1] < W) 1 else 2
+    bothside[0] = if(e[0][0]+e[1][0] < W) 1 else 2
 
-2. 0번째 열과 N-1번째 열의 안쪽행을 한번의 침투로 가능한 경우
+2. 0번째 열과 N-1번째 열의 안쪽 원을 한번의 침투로 가능한 경우
     e[0][0]+e[0][N-1] < W 인 경우 한번의 침투로 가능합니다. 초기에 이 두 구역을 침투하므로 두 구역을 없는 구역으로 생각하여 나머지 구역을 계산하면 됩니다.
     0번재 열의 안쪽이 없으므로 1번째 열에서 초기값을 정할 수 있습니다. (0번째 열의 바깥쪽만 고려하면 되므로)
     e[1][0]구역과 e[0][1]구역을 침투해야하며 두 구역은 붙어있지 않아 두 번 침투해야합니다.
@@ -83,8 +131,19 @@ bothside[i] : i번째 열을 점령하는데 드는 최소 특수소대의 수
     위에서 구한 outside[1]이 1인 경우 e[0][1]구역을 추가로 침투하면 됩니다.
     또는 e[0][1]+e[1][1] < W라면 1번째 열은 한 번에 침투가 가능하므로 bothside[1] = 2가 가능합니다.
     bothside[1] = if(outside[1] == 1 || (e[0][1]+e[1][1] < W)) 2 else 3
-    
-    
+
+3. 0번째 열과 N-1번째 열의 바깥쪽 원을 한번의 침투로 가능한 경우
+    e[1][0]+e[1][N-1] < W 인 경우 한번의 침투로 가능합니다. 초기에 이 두 구역을 침투하므로 두 구역을 없는 구역으로 생각하여 나머지 구역을 계산하면 됩니다.
+    2.와 마찬가지로 1번째 열에서 초기값을 정할 수 있습니다.
+    e[0][0]구역과 e[0][1]구역이 붙어있어 두 구역의 적의 수가 W보다 작다면 한 번에 침투가 가능합니다.
+    inside[1] = if(e[0][0]+e[0][1] < W) 1 else 2
+    e[0][0]구역과 e[1][1]구역을 침투해야하며 두 구역은 붙어있지 않아 두 번 침투해야합니다.
+    outside[1] = 2
+    위에서 구한 inside[1]이 1인 경우 e[1][1]구역을 추가로 침투하면 됩니다.
+    또는 e[0][1]+e[1][1] < W라면 1번째 열은 한 번에 침투가 가능하므로 bothside[1] = 2가 가능합니다.
+    bothside[1] = if(inside[1] == 1 || (e[0][1]+e[1][1] < W)) 2 else 3
+
+
 
 
 
