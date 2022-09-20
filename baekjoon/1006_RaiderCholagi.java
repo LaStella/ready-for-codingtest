@@ -1,6 +1,3 @@
-// 습격자 초라기
-// https://www.acmicpc.net/problem/1006
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,7 +7,11 @@ public class Main {
     static int N, W;
     static int[][] e;
     static int[] inside, outside, bothside;
+<<<<<<< HEAD
     static int inf = 987654321;
+=======
+    static int inf = Integer.MAX_VALUE/2;
+>>>>>>> 419b4dc00313f7d65fb8227e428248a24060d4dd
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
@@ -60,9 +61,52 @@ public class Main {
             calc();
 
             answer = Math.min(answer, bothside[N]);
+<<<<<<< HEAD
+=======
+
+            // N이 1인 경우 case1의 답이 정답입니다.
+            if (N != 1) {
+                // calc함수에서 case 3-4를 계산하는 경우 존재할 수 없는 bothside[0]에 접근하므로 이 경우 최소 값이 되지 않도록 나올수 없는 최대값으로 초기화합니다.
+                bothside[0] = inf;
+
+                // case 2. 안쪽 원의 첫번째열과 마지막열의 적 수가 W이하 라면 한 번의 투입으로 점령이 가능합니다.
+                if (e[0][1]+e[0][N] <= W) {
+                    inside[1] = inf;
+                    outside[1] = 1;
+                    bothside[1] = 1;
+                    calc();
+
+                    // 안쪽 원의 첫번째열과 마지막열을 점령(투입 소대 수 +1)하였으므로 마지막열의 바깥쪽 원을 점령하는데 필요한 최소 소대의 수를 구합니다.
+                    answer = Math.min(answer, outside[N]+1);
+                }
+
+                // case 3. 바깥쪽 원의 첫번째열과 마지막열의 적 수가 W이하 라면 한 번의 투입으로 점령이 가능합니다.
+                if (e[1][1]+e[1][N] <= W) {
+                    inside[1] = 1;
+                    outside[1] = inf;
+                    bothside[1] = 1;
+                    calc();
+
+                    // 위와 마찬가지로 마지막열의 안쪽 원을 점령하는데 필요한 최소 소대의 수에 +1(첫번째열과 마지막열의 바깥쪽을 점령하는 소대)합니다.
+                    answer = Math.min(answer, inside[N]+1);
+                }
+
+                // case 4. 안쪽 원과 바깥쪽 원 모두 첫번째열과 마지막열의 적 수가 W이하 라면 두 번의 투입으로 점령이 가능합니다.
+                if (e[0][1]+e[0][N] <= W && e[1][1]+e[1][N] <= W) {
+                    inside[1] = inf;
+                    outside[1] = inf;
+                    bothside[1] = 0;
+                    calc();
+
+                    // 마지막 전(N-2)까지 모두 점령하는데 필요한 최소 소대의 수에 +2합니다.
+                    answer = Math.min(answer, bothside[N-1]+2);
+                }
+            }
+>>>>>>> 419b4dc00313f7d65fb8227e428248a24060d4dd
 
             // calc함수에서 case 3-4를 계산하는 경우 존재할 수 없는 bothside[0]에 접근하므로 이 경우 최소 값이 되지 않도록 나올수 없는 최대값으로 초기화합니다.
 
+<<<<<<< HEAD
 
             // case 2. 안쪽 원의 첫번째열과 마지막열의 적 수가 W이하 라면 한 번의 투입으로 점령이 가능합니다.
             if (e[0][1]+e[0][N] <= W) {
@@ -115,6 +159,39 @@ public class Main {
             inside[i] = Math.min(bothside[i-1]+1, outside[i-1]+inner);
             outside[i] = Math.min(bothside[i-1]+1, inside[i-1]+outer);
             bothside[i] = Math.min(bothside[i-1]+column, Math.min(inside[i]+1, Math.min(outside[i]+1, bothside[i-2]+outer+inner)));
+=======
+    // 원의 안쪽, 바깥쪽, 양쪽을 점령하는데 필요한 최소 소대의 수를 계산하는 함수입니다.
+    public static void calc() {
+        for (int i = 2 ; i <= N ; i++) {
+            // case 1-1. i번 안쪽 구역까지 점령하는데 필요한 최소 소대수
+            inside[i] = bothside[i-1]+1;
+
+            // case 1-2. i번 안쪽 구역의 붙어있는 두 구역의 적들이 W보다 작다면 한번의 침투로 가능합니다. (인접한 구역으로 한번 더 침투가 가능하므로)
+            if (e[0][i]+e[0][i-1] <= W) {
+                inside[i] = Math.min(inside[i], outside[i-1]+1);
+            }
+
+            // case 2-1. i번 바깥쪽 구역까지 점령하는데 필요한 최소 소대수
+            outside[i] = bothside[i-1]+1;
+
+            // case 2-2. 위와 마찬가지로 인접한 두 구역 적들이 W보다 작아 한번의 침투로 가능합니다.
+            if (e[1][i]+e[1][i-1] <= W) {
+                outside[i] = Math.min(outside[i], inside[i-1]+1);
+            }
+
+            // case 3-1, 3-2. i번 안쪽과 바깥쪽까지 모두 점령하는데 필요한 최소 소대수
+            bothside[i] = Math.min(inside[i]+1, outside[i]+1);
+
+            // case 3-3. i번 구역의 안쪽과 바깥쪽 적들이 W보다 작다면 한번의 침투로 가능합니다.
+            if (e[0][i]+e[1][i] <= W) {
+                bothside[i] = Math.min(bothside[i], bothside[i-1]+1);
+            }
+
+            // case 3-4. case 1-2와 case 2-2가 동시에 존재하여 i-2번째 구역까지 점령한 소대수에서 2개 소대를 더하면 i번째 구역까지 점령이 가능합니다.
+            if (e[0][i]+e[0][i-1] <= W && e[1][i]+e[1][i-1] <= W) {
+                bothside[i] = Math.min(bothside[i], bothside[i-2]+2);
+            }
+>>>>>>> 419b4dc00313f7d65fb8227e428248a24060d4dd
         }
     }
 }
