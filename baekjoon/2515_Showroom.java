@@ -16,10 +16,45 @@ public class Main {
         int N = Integer.parseInt(st.nextToken());
         int S = Integer.parseInt(st.nextToken());
 
-        int[] h = new int[N+1];
-        int[] c = new int[N+1];
+        Queue<Paint> q = new PriorityQueue<>();
 
+        for (int i = 0 ; i < N ; i++) {
+            st = new StringTokenizer(br.readLine());
+            int h = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+            q.add(new Paint(h, c);
+        }
 
+        Paint[] p = new Paint[N+1];
+
+        for (int i = 1 ; i <= N ; i++) {
+            p[i] = q.poll();
+        }
+
+        int[] dp = new int[N+1];
+
+        for (int i = 1 ; i <= N ; i++) {
+            dp[i] = dp[i-1];
+            for (int j = 1 ; j < i ; j++) {
+                if (p[i].height - p[j].height >= S) {
+                    dp[i] = Math.max(dp[i], dp[j] + p[i].cost);    
+                }
+            }
+        }
+    }
+}
+
+class Paint implements Comparable<Paint> {
+    int height, cost;
+
+    public Paint(int h, int c) {
+        this.height = h;
+        this.cost = c;
+    }
+
+    @Override
+    public int compareTo(Paint o) {
+        return this.height - o.height;
     }
 }
 
