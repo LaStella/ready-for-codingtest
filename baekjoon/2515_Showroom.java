@@ -4,7 +4,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
 import java.util.*;
 
 public class Main {
@@ -22,25 +21,42 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             int h = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
-            q.add(new Paint(h, c);
+            q.add(new Paint(h, c));
         }
 
         Paint[] p = new Paint[N+1];
+
+        p[0] = new Paint(0, 0);
 
         for (int i = 1 ; i <= N ; i++) {
             p[i] = q.poll();
         }
 
+        // dp[i] : i번 그림까지 최대 가격 합
         int[] dp = new int[N+1];
+        // : i번 그림보다 S이상 작으면서 가장 큰 그림의 번호
+        int[] max = new int[N+1];
 
+        // 각 그림마다 S이상 작으면서 가장 큰 그림의 번호를 찾습니다.
         for (int i = 1 ; i <= N ; i++) {
-            dp[i] = dp[i-1];
-            for (int j = 1 ; j < i ; j++) {
+            // S보다 작은 그림은 앞에 그림을 놓을 수 없으므로 0입니다.
+            if (p[i].height < S) continue;
+
+            //
+            for (int j = i-1 ; j >= max[i-1] ; j--) {
                 if (p[i].height - p[j].height >= S) {
-                    dp[i] = Math.max(dp[i], dp[j] + p[i].cost);    
+                    max[i] = j;
+                    break;
                 }
             }
         }
+
+        for (int i = 1 ; i <= N ; i++) {
+            dp[i] = p[i].cost + dp[max[i]];
+            dp[i] = Math.max(dp[i], dp[i-1]);
+        }
+
+        System.out.println(dp[N]);
     }
 }
 
