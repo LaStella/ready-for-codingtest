@@ -42,15 +42,17 @@ public class Main {
             // S보다 작은 그림은 앞에 그림을 놓을 수 없으므로 0입니다.
             if (p[i].height < S) continue;
 
-            //
-            for (int j = i-1 ; j >= max[i-1] ; j--) {
-                if (p[i].height - p[j].height >= S) {
-                    max[i] = j;
+            // 바로 전 그림의 max에서부터 i번그림까지 S이상 작으면서 가장 큰 그림을 찾습니다.
+            for (int j = max[i-1] ; j <= i ; j++) {
+                if (p[i].height - p[j].height < S) {
+                    max[i] = --j;
                     break;
                 }
             }
+
         }
 
+        // i번 그림을 포함하는 경우와 포함하지 않는 경우(i-1번에서 최대 가치)중 더 큰 값을 저장합니다.
         for (int i = 1 ; i <= N ; i++) {
             dp[i] = p[i].cost + dp[max[i]];
             dp[i] = Math.max(dp[i], dp[i-1]);
