@@ -2,6 +2,7 @@
 // https://www.acmicpc.net/problem/4013
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -10,14 +11,20 @@ public class Main {
     static int[] atm;
     static boolean[] restaurant;
     static ArrayList<ArrayList<Integer>> edge_list = new ArrayList<>();
+    static ArrayList<ArrayList<Integer>> scc_list = new ArrayList<>();
+    static boolean[] visited;
+    static boolean[] finishied;
+    static int[] d;
+    static int id = 0;
+    static Stack<Integer> st = new Stack<>();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        int N = Integer.parseInt(br.readLine());
-        int M = Integer.parseInt(br.readLine());
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
 
         // N개의 교차로를 생성합니다.
         for (int i = 0 ; i <= N ; i++) {
@@ -37,7 +44,7 @@ public class Main {
         atm = new int[N+1];
 
         // 각 ATM에 들어있는 돈을 저장합니다.
-        for (int i = 1 ; i < N ; i++) {
+        for (int i = 1 ; i <= N ; i++) {
             atm[i] = Integer.parseInt(br.readLine());
         }
 
@@ -56,6 +63,42 @@ public class Main {
         }
 
 
+        visited = new boolean[N+1];
+        finishied = new boolean[N+1];
+        d = new int[N+1];
+
+        for (int i = 1 ; i <= N ; i++) {
+            if (d[i] == 0) dfs(i);
+        }
+
+        System.out.println("!");
+    }
+
+    public static int dfs(int x) {
+//        visited[x] = true;
+        d[x] = ++id;
+        st.push(x);
+
+        int parent = x;
+        for (int i = 0 ; i < edge_list.get(x).size() ; i++) {
+            int y = edge_list.get(x).get(i);
+//            if (!visited[y]) parent = Math.min(parent, dfs(y));
+            if (d[y] == 0) parent = Math.min(parent, dfs(y));
+            else if (!finishied[y]) parent = Math.min(parent, d[y]);
+        }
+
+        if (parent == d[x]) {
+            ArrayList<Integer> scc = new ArrayList<>();
+            while(true) {
+                int intersection = st.pop();
+                scc.add(intersection);
+                finishied[intersection] = true;
+                if (intersection == x) break;
+            }
+            scc_list.add(scc);
+        }
+
+        return parent;
     }
 }
 
