@@ -18,6 +18,7 @@ public class Main {
     static boolean[] visited; // 방문한 교차로(정점)을 나타내는 배열
     static boolean[] finishied; // SCC탐색이 완료된 교차로를 나타내는 배열
     static Stack<Integer> st = new Stack<>(); // SCC탐색시 방문한 교차로(정점)를 저장하는 스택
+    static int[] dp;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -73,6 +74,12 @@ public class Main {
             if (!visited[i]) dfs(i);
         }
 
+        makeSccEdgeList();
+
+        dp = new int[sccIndex];
+
+
+
         System.out.println("!"); // breakpoint
     }
 
@@ -109,7 +116,7 @@ public class Main {
     }
 
     // 각 scc그룹을 하나의 교차로(정점)으로 보고 도로(간선)를 만드는 함수입니다.
-    public void makeSccEdgeList() {
+    public static void makeSccEdgeList() {
         sccAtm = new int[sccIndex];
         for (int i = 0 ; i < sccIndex ; i++) {
             scc_edge_list.add(new ArrayList<>());
@@ -124,6 +131,10 @@ public class Main {
                 if (sccNum[i] != sccNum[j]) scc_edge_list.get(sccNum[i]).add(sccNum[j]);
             }
         }
+    }
+
+    public static void bfs() {
+
     }
 }
 
