@@ -19,6 +19,7 @@ public class Main {
     static boolean[] finishied; // SCC탐색이 완료된 교차로를 나타내는 배열
     static Stack<Integer> st = new Stack<>(); // SCC탐색시 방문한 교차로(정점)를 저장하는 스택
     static int[] dp;
+    static int start;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -53,7 +54,7 @@ public class Main {
         st = new StringTokenizer(br.readLine());
 
         // 시작 교차로와 레스토랑의 개수를 입력받습니다.
-        int start = Integer.parseInt(st.nextToken());
+        start = Integer.parseInt(st.nextToken());
         int P = Integer.parseInt(st.nextToken());
 
         restaurant = new boolean[N+1];
@@ -74,13 +75,22 @@ public class Main {
             if (!visited[i]) dfs(i);
         }
 
+        // scc그룹간 도로(간선)를 연결합니다.
         makeSccEdgeList();
 
+        // dp[i] : i번 scc그룹에서 얻을 수 있는 최대 금액
         dp = new int[sccIndex];
 
+        bfs();
 
 
-        System.out.println("!"); // breakpoint
+        // scc그룹에서 레스토랑이 있는 지점 중 최대 금액을 탐색합니다.
+        int max = 0;
+        for (int i = 1 ; i <= N ; i++) {
+            if (restaurant[i]) max = Math.max(max, dp[sccNum[i]]);
+        }
+
+        System.out.println(max);
     }
 
     // DFS알고리즘을 이용하여 SCC를 찾는 함수입니다.
@@ -133,11 +143,41 @@ public class Main {
         }
     }
 
+    // scc그룹을 완전탐색하여 각 그룹에서 얻을 수 있는 최대 금액을 계산합니다.
     public static void bfs() {
+        Queue<Integer> q = new LinkedList<>();
+        q.add(sccNum[start]);
+        dp[sccNum[start]] = sccAtm[sccNum[start]];
 
+        while (!q.isEmpty()) {
+            int nowNum = q.poll();
+
+            for (Integer nextNum : scc_edge_list.get(nowNum)) {
+                if (dp[nextNum] < dp[nowNum] + sccAtm[nextNum]) {
+                    dp[nextNum] = dp[nowNum] + sccAtm[nextNum];
+                    q.add(nextNum);
+                }
+            }
+        }
     }
 }
 
+
+
+/*
+주어진 교차로(정점)와 도로(간선)을 이용하여 SCC를 찾습니다.
+같은 SCC그룹에 속하는 교차로는 서로 도달이 가능합니다.
+찾은 SCC그룹을 각각 하나의 교차로(정점)으로 보고 도로를 연결합니다.
+서로 다른 SCC그룹에 속한 두 교차로에 연결된 도로가 있다면 두 SCC그룹 사이에 간선이 존재합니다.
+
+각 SCC그룹을 하나의 교차로로 보기때문에 SCC그룹내의 모든 ATM에 들어있는 돈을 합하여 sccATM에 저장합니다.
+
+출발 교차로가 속한 SCC그룹에서 출발하여 이동가능한 모든 SCC그룹으로 이동하며 누적된 ATM금액을 dp에 저장합니다.
+이때 이동 가능한 모든 SCC그룹으로 완전탐색을 합니다. (BFS를 이용)
+dp[i] : i번 SCC그룹에서 얻을 수 있는 최대 금액
+
+
+ */
 
 /*
 오랜시간 고민했으나 해결방법을 찾지못하여 참고
