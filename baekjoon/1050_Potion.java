@@ -31,21 +31,34 @@ public class Main {
         while(!queue.isEmpty() && queue.size() != cycleCount) {
             String recipe = queue.poll();
             String[] recipeArray = recipe.split("=");
-            String name = recipeArray[0];
+            String recipeName = recipeArray[0];
             String[] material = recipeArray[1].split("\\+");
 
             int recipeCost = 0;
+            boolean isComplete = true;
             for (String s : material) {
                 int materialCount = Integer.parseInt(s.replaceAll("[^0-9]", ""));
                 String materialName = s.replaceAll("[0-9]", "");
+                // 찾는 재료가 없다면 제조를 중단하고 제조법을 다시 큐에 넣습니다.
                 if (!map.containsKey(materialName)) {
-                    queue.add(recipe);
+                    isComplete = false;
                     break;
                 }
+
                 recipeCost += materialCount*map.get(materialName);
             }
 
             cycleCount++;
+
+            // 새로 재료가 추가되는 경우
+            if (isComplete) {
+                // 이미 추가되어있는 재료라면 최소값을 저장으로 수정합니다.
+                if (map.putIfAbsent(recipeName, recipeCost) != null) {
+                    map.put(recipeName, Math.min(map.get(recipeName), recipeCost));
+                }
+                // 사이클횟수를 초기화합니다.
+                cycleCount = 0;
+            }
         }
 
     }
