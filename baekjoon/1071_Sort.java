@@ -77,9 +77,14 @@ public class Main {
             return;
         }
 
+        // 이전 숫자와 작은 숫자가 연속된 숫자인 경우 큰 수를 1번 출력 후 나머지를 출력합니다.
+        if (prevNumb + 1 == smallNumb) {
+            sb.append(bigNumb + " ");
+            map.compute(bigNumb, (k, v)-> v-1);
+        }
         sb.append(getRepeatNumber(smallNumb, map));
         sb.append(getRepeatNumber(bigNumb, map));
-        System.out.println(sb.toString());
+        System.out.println(sb);
     }
 
     // 매개변수로 받은 number를 현재 미출력한 개수만큼 반복한 문자열을 리턴하는 함수입니다.
@@ -87,6 +92,7 @@ public class Main {
         return (number + " ").repeat(map.get(number));
     }
 }
+
 
 /*
 맵에 숫자를 key로, 나온 횟수를 value로 저장합니다.
@@ -119,4 +125,6 @@ public class Main {
 연속하지 않는 경우 뽑은 숫자를 횟수만큼 출력합니다.
 우선순위큐에 남은 숫자가 2개라면 연속된 숫자인지 확인하여 출력 순서를 정합니다.
 
-*/
+문제발생3 > 마지막에 남은 두 숫자가 연속된 숫자가 아닌 경우 작은 숫자부터 출력하였습니다.
+          이때 이전에 출력한 숫자와 연속되는 경우가 존재하므로 이를 수정하였습니다.
+ */
