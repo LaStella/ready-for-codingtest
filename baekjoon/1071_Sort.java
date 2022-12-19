@@ -36,18 +36,37 @@ public class Main {
     private static void sortList(List<Integer> list) {
         Collections.sort(list);
         int prevIndex = 0;
-        for (int i = 1 ; i < list.size() ; i++) {
-            for (int j = i ; j < list.size() ; j++) {
-                if (list.get(prevIndex) + 1 != list.get(j)) {
-                    swapNumber(i, j, list);
-                    break;
+        for (int i = 1 ; i < list.size()-1 ; i++) {
+            // 연속되는 경우
+            if (list.get(prevIndex) + 1 == list.get(i)) {
+                int index = getBackIndex(i, list);
+                if (index == -1) {
+                    index = getFrontIndex(prevIndex, list);
                 }
-                if (j == list.size()-1) {
-                    swapNumber(prevIndex, j, list);
-                }
+                swapNumber(i, index, list);
             }
             prevIndex = i;
         }
+    }
+
+    private static int getFrontIndex(int start, List<Integer> list) {
+        for (int i = start - 1 ; i >= 0 ; i--) {
+            if (list.get(i) != list.get(start)) {
+                return i+1;
+            }
+        }
+
+        return 0;
+    }
+
+    private static int getBackIndex(int start, List<Integer> list) {
+        for (int i = start + 1 ; i < list.size() ; i++) {
+            if (list.get(i) != list.get(start)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private static void swapNumber(int index1, int index2, List<Integer> list) {
@@ -76,4 +95,6 @@ public class Main {
 다음으로 큰 수를 찾지 못하는 경우 이전 숫자와 위치를 바꿉니다.
 
 문제발생2 > 반례존재 1 1 1 2 2 2 3 3 3 4 4 4
+
+(수정) 다음으로 큰 수를 찾지 못하는 경우 이전 숫자들 중 연속되지 않는 숫자를 찾아 바꿉니다.
  */
