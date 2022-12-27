@@ -15,7 +15,7 @@ public class Main {
         int b = Integer.parseInt(st.nextToken());
         int k = Integer.parseInt(st.nextToken());
 
-        long[] dp = new long[1000001];
+        int[] dp = new int[1000001];
         Arrays.fill(dp, -1);
         boolean[] visited = new boolean[1000001];
 
@@ -29,28 +29,60 @@ public class Main {
     }
 
     // 수열의 최소값을 구하는 함수입니다.
-    private static long getMinS(int numb, int k, long[] dp) {
+    private static long getMinS(int numb, int k, int[] dp) {
         Stack<Integer> stack = new Stack<>();
         stack.add(numb);
         // a부터 수열을 구합니다. a, S(a), S(S(a)), ...
         while (true) {
             int s = getS(numb, k);
 
-            //
+            // 사이클이 확인되는 경우
             if (dp[s] == -1 && stack.contains(s)) {
+                // 사이클을 이루는 모든 수열의 숫자를 우선순위큐에 넣습니다.
+                PriorityQueue<Integer> priorityQueue = new PriorityQueue<>();
+                while (stack.peek() != s) {
+                    priorityQueue.add(stack.pop());
+                }
+                priorityQueue.add(s);
+//
+//                if (priorityQueue.peek() == null) {
+//                    return stack.pop();
+//                }
 
+                int min = priorityQueue.peek();
+
+                while (!priorityQueue.isEmpty()) {
+                    dp[priorityQueue.poll()] = min;
+                }
+
+                while (!stack.isEmpty()) {
+                    int now = stack.pop();
+                    if (dp[now] == -1) {
+                        min = Math.min(min, now);
+                        dp[now] = min;
+                    }
+                }
+
+                return min;
             }
 
             // 이미 구한적 있는 숫자면 최소
             if (dp[s] != -1) {
+                int min = dp[s];
 
+                while (!stack.isEmpty()) {
+                    int now = stack.pop();
+                    if (dp[now] == -1) {
+                        min = Math.min(min, now);
+                        dp[now] = min;
+                    }
+                }
+
+                return min;
             }
 
-
             stack.add(s);
-
-
-
+            numb = s;
         }
     }
 
@@ -87,11 +119,12 @@ S값을 계산하였을 때 이미 이전에 구한 값이라면 반복되므로
         사이클 내에서의 최소값을 찾아 사이클에 속하는 숫자들의 최소값을 저장합니다.
         61부터 3까지 남은 숫자에 대해서 최소값을 갱신해가며 저장합니다.
             ex) dp[61] = Math.min(61, 4) -> dp[65] = Math.min(65, 4) -> dp[81] = Math.min(81, 4) ...
-                dp[3] = Math.min(3, 4) 
+                dp[3] = Math.min(3, 4)
 각 수열의 숫자에 대해서 최소값을 저장하는 dp배열을 만듭니다.
 dp[] : i숫자에 대한 수열의 최소값
 Sk(i)를 한 수를 미리 구하여 저장합니다.
     이때 Sk(i) 는 1000000 보다 클 수 있기때문에 수가 큰 경우 한번더 S함수를 구합니다.
 
-
+문제발생 > 예제 입력 5번 실패
+999999에 대한 오버플로우 문제 확인중
  */
